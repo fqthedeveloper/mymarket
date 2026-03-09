@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ seller.username }} | Exotic</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Georgia', serif;
+            background: black;
+            color: gold;
+        }
+
+        header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid gold;
+        }
+
+        h1 {
+            font-size: 36px;
+            letter-spacing: 2px;
+        }
+
+        .container {
+            padding: 30px;
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        .info-box {
+            border: 1px solid gold;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .info-box h2 {
+            margin-top: 0;
+        }
+
+        .qr img {
+            width: 200px;
+            margin-top: 15px;
+        }
+
+        .products {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .product-card {
+            border: 1px solid gold;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .product-card img {
+            width: 100%;
+            height: auto;
+        }
+
+        .verified {
+            color: gold;
+            font-size: 18px;
+            margin-left: 8px;
+        }
+
+        a {
+            color: gold;
+            text-decoration: none;
+        }
+
+        .back-home {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 8px 15px;
+            border: 1px solid gold;
+        }
+
+        .back-home:hover {
+            background: gold;
+            color: black;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>
+        {{ seller.username }}
+        <span class="verified">✔ Verified</span>
+    </h1>
+</header>
+
+<div class="container">
+
+    <div class="info-box">
+        <h2>Shop Details</h2>
+
+        <p><strong>Shop Name:</strong> {{ profile.shop_name|default:"Not Provided" }}</p>
+        <p><strong>Address:</strong> {{ profile.shop_address|default:"Not Provided" }}</p>
+
+        {% if profile.qr_code %}
+            <div class="qr">
+                <p><strong>Scan & Pay:</strong></p>
+                <img src="{{ profile.qr_code.url }}">
+            </div>
+        {% endif %}
+    </div>
+
+    <h2>Products by {{ seller.username }}</h2>
+
+    <div class="products">
+        {% for product in products %}
+            <div class="product-card">
+                <img src="{{ product.image.url }}">
+                <p>{{ product.title }}</p>
+            </div>
+        {% empty %}
+            <p>No products available.</p>
+        {% endfor %}
+    </div>
+
+    <a href="/" class="back-home">← Back to Home</a>
+
+</div>
+
+</body>
+</html>

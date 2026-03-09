@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Product - Aesthetic</title>
+
+    <style>
+        body{
+            font-family: Arial;
+            background: black;
+            color: white;
+            padding: 40px;
+        }
+
+        input, textarea{
+            width: 420px;
+            padding: 8px;
+            margin-top: 6px;
+            margin-bottom: 20px;
+        }
+
+        label{
+            color: gold;
+            font-weight: bold;
+        }
+
+        button{
+            background: gold;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover{
+            background: #d4af37;
+        }
+
+        h3{
+            color: gold;
+        }
+    </style>
+
+</head>
+<body>
+
+<h2>Upload Product</h2>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <label>Product Title</label><br>
+    <input type="text" name="title" placeholder="Product Title" required><br>
+
+    <label>Product Description</label><br>
+    <textarea name="description" placeholder="Product Description" required></textarea><br>
+
+    <label>Product Image</label><br>
+    <input type="file" name="image" required><br>
+
+
+    <h3>Automatic Answers for Buyer Questions</h3>
+
+
+    <label>Buyer Question: What is the price?</label><br>
+    <input type="text" name="price_reply" placeholder="Example: ₹1500"><br>
+
+
+    <label>Buyer Question: What sizes are available?</label><br>
+    <input type="text" name="size_reply" placeholder="Example: M, L, XL"><br>
+
+
+    <label>Buyer Question: Can you share more details about this product?</label><br>
+    <textarea name="details_reply" placeholder="Example: Pure cotton embroidered kurta"></textarea><br>
+
+
+    <button type="submit">Upload</button>
+
+</form>
+
+<p><a href="/">Back to Home</a></p>
+
+</body>
+</html>

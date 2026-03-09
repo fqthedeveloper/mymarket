@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Exotic</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&display=swap" rel="stylesheet">
+
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<style>
+
+body{
+margin:0;
+font-family:Arial;
+background:black;
+color:white;
+}
+
+header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:20px 30px;
+border-bottom:1px solid gold;
+}
+
+.logo{
+font-family:'Cinzel',serif;
+font-size:32px;
+color:gold;
+}
+
+/* SEARCH BAR */
+
+.search-box{
+margin-left:30px;
+flex:1;
+}
+
+.search-box input{
+width:60%;
+padding:8px 12px;
+border-radius:6px;
+border:1px solid gold;
+background:black;
+color:white;
+}
+
+.btn{
+text-decoration:none;
+background:gold;
+color:black;
+padding:8px 15px;
+border-radius:6px;
+margin-left:8px;
+font-weight:bold;
+}
+
+.grid{
+column-count:4;
+column-gap:20px;
+padding:30px;
+}
+
+.card{
+break-inside:avoid;
+margin-bottom:20px;
+position:relative;
+background:#111;
+border-radius:12px;
+overflow:hidden;
+box-shadow:0 0 15px rgba(255,215,0,0.2);
+}
+
+/* GOLD BORDER IF CHAT EXISTS */
+
+.card.chat-active{
+border:2px solid gold;
+}
+
+.card img{
+width:100%;
+display:block;
+cursor:pointer;
+}
+
+/* ACTION BAR */
+
+.action-bar{
+position:absolute;
+bottom:0;
+left:0;
+width:100%;
+background:rgba(0,0,0,0.9);
+display:flex;
+justify-content:space-around;
+align-items:center;
+padding:10px 0;
+border-top:1px solid gold;
+display:none;
+}
+
+/* ICON STYLE */
+
+.icon-btn{
+background:none;
+border:none;
+cursor:pointer;
+color:gold;
+}
+
+.icon-btn svg{
+width:22px;
+height:22px;
+stroke:gold;
+fill:none;
+stroke-width:2;
+}
+
+.icon-btn:hover svg{
+transform:scale(1.2);
+}
+
+/* FULLSCREEN IMAGE */
+
+.fullscreen{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:black;
+display:flex;
+justify-content:center;
+align-items:center;
+z-index:9999;
+}
+
+.fullscreen img{
+max-width:95%;
+max-height:95%;
+border-radius:10px;
+}
+
+/* responsive */
+
+@media (max-width:1000px){ .grid{column-count:3;} }
+@media (max-width:700px){ .grid{column-count:2;} }
+@media (max-width:500px){ .grid{column-count:1;} }
+
+</style>
+
+<script>
+
+function toggleBar(id){
+
+let bar=document.getElementById("bar-"+id);
+
+if(bar.style.display==="flex"){
+bar.style.display="none";
+}else{
+bar.style.display="flex";
+}
+
+}
+
+/* LIKE */
+
+function likeProduct(id){
+alert("You liked this product");
+}
+
+/* SHARE */
+
+function shareProduct(id){
+const link = window.location.origin + "/chat/" + id + "/";
+navigator.clipboard.writeText(link);
+alert("Product link copied");
+}
+
+/* LONG PRESS IMAGE ZOOM */
+
+let pressTimer;
+
+function startPress(img){
+
+pressTimer=setTimeout(function(){
+openFullscreen(img.src);
+},1000);
+
+}
+
+function cancelPress(){
+clearTimeout(pressTimer);
+}
+
+/* FULLSCREEN VIEW */
+
+function openFullscreen(src){
+
+let overlay=document.createElement("div");
+overlay.className="fullscreen";
+
+let image=document.createElement("img");
+image.src=src;
+
+overlay.appendChild(image);
+
+overlay.onclick=function(){
+document.body.removeChild(overlay);
+}
+
+document.body.appendChild(overlay);
+
+}
+
+</script>
+
+</head>
+
+<body>
+
+<header>
+
+<div class="logo">Exotic</div>
+
+<!-- SEARCH BAR -->
+<div class="search-box">
+<form method="get" action="/">
+<input type="text" name="q" placeholder="🔍 Search products...">
+</form>
+</div>
+
+<div>
+
+{% if user.is_authenticated %}
+
+<a href="/wishlist/" class="btn">MyWishlist</a>
+
+{% if user.profile.is_seller %}
+<a href="/seller/" class="btn">Seller Dashboard</a>
+{% endif %}
+
+<form method="post" action="/logout/" style="display:inline;">
+{% csrf_token %}
+<button type="submit" class="btn">Logout</button>
+</form>
+
+{% else %}
+
+<a href="/login/" class="btn">Login</a>
+<a href="/register/" class="btn">Register</a>
+
+{% endif %}
+
+</div>
+
+</header>
+
+<div class="grid">
+
+{% for product in products %}
+
+<div class="card {% if product.has_messages %}chat-active{% endif %}">
+
+<img src="{{ product.image.url }}"
+onclick="toggleBar({{ product.id }})"
+onmousedown="startPress(this)"
+onmouseup="cancelPress()"
+onmouseleave="cancelPress()">
+
+<div class="action-bar" id="bar-{{ product.id }}">
+
+<!-- SELLER -->
+<button class="icon-btn"
+onclick="window.location.href='/seller/{{ product.seller.username }}/'">
+<i data-lucide="contact"></i>
+</button>
+
+<!-- SAVE -->
+<button class="icon-btn"
+onclick="window.location.href='/save/{{ product.id }}/'">
+<i data-lucide="map-pin"></i>
+</button>
+
+<!-- LIKE -->
+<button class="icon-btn"
+onclick="likeProduct({{ product.id }})">
+<i data-lucide="heart"></i>
+</button>
+
+<!-- CHAT -->
+<button class="icon-btn"
+onclick="window.location.href='/chat/{{ product.id }}/'">
+<i data-lucide="message-circle"></i>
+</button>
+
+<!-- SHARE -->
+<button class="icon-btn"
+onclick="shareProduct({{ product.id }})">
+<i data-lucide="send"></i>
+</button>
+
+</div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+<script>
+lucide.createIcons();
+</script>
+
+</body>
+</html>

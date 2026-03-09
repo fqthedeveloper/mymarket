@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Seller Dashboard | Exotic</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&display=swap" rel="stylesheet">
+
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: black;
+        color: white;
+    }
+
+    header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 30px;
+        background: black;
+        border-bottom: 1px solid gold;
+    }
+
+    .logo {
+        font-family: 'Cinzel', serif;
+        font-size: 28px;
+        color: gold;
+        letter-spacing: 2px;
+    }
+
+    .btn {
+        text-decoration: none;
+        background: gold;
+        color: black;
+        padding: 8px 15px;
+        border-radius: 6px;
+        margin-left: 10px;
+        font-weight: bold;
+    }
+
+    .btn:hover {
+        background: #d4af37;
+    }
+
+    .top-buttons {
+        display: flex;
+        align-items: center;
+    }
+
+    .grid {
+        column-count: 4;
+        column-gap: 20px;
+        padding: 30px;
+    }
+
+    .card {
+        break-inside: avoid;
+        margin-bottom: 20px;
+        position: relative;
+        background: #111;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 0 15px rgba(255,215,0,0.2);
+    }
+
+    /* 🔥 GOLD BORDER WHEN CHAT EXISTS */
+    .card.chat-active {
+        border: 2px solid gold;
+    }
+
+    .card img {
+        width: 100%;
+        display: block;
+    }
+
+    .dots {
+        position: absolute;
+        top: 10px;
+        right: 12px;
+        font-size: 22px;
+        cursor: pointer;
+        font-weight: bold;
+        color: black;
+        transition: 0.3s ease;
+    }
+
+    .dots.glow {
+        color: gold;
+        text-shadow: 0 0 6px gold, 0 0 12px gold, 0 0 18px rgba(255,215,0,0.6);
+    }
+
+    .menu {
+        display: none;
+        position: absolute;
+        top: 40px;
+        right: 10px;
+        background: black;
+        border: 1px solid gold;
+        border-radius: 8px;
+        min-width: 180px;
+        z-index: 100;
+    }
+
+    .menu button {
+        width: 100%;
+        border: none;
+        background: none;
+        padding: 12px;
+        text-align: left;
+        cursor: pointer;
+        color: gold;
+    }
+
+    .menu button:hover {
+        background: rgba(255,215,0,0.1);
+    }
+
+    .gold-dot {
+        height: 8px;
+        width: 8px;
+        background: gold;
+        border-radius: 50%;
+        display: inline-block;
+        margin-left: 6px;
+    }
+
+    @media (max-width:1000px){ .grid{column-count:3;} }
+    @media (max-width:700px){ .grid{column-count:2;} }
+    @media (max-width:500px){ .grid{column-count:1;} }
+
+</style>
+
+<script>
+    function toggleMenu(id){
+        let menu = document.getElementById("menu-"+id);
+        menu.style.display = menu.style.display === "block" ? "none" : "block";
+    }
+</script>
+
+</head>
+<body>
+
+<header>
+    <div class="logo">Exotic — {{ user.username }}</div>
+
+<div class="top-buttons">
+    <a href="/upload/" class="btn">Upload Product</a>
+    <a href="/seller-settings/" class="btn">Update Shop Details</a>
+    <a href="/" class="btn">Home</a>
+
+    <form method="post" action="/logout/" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn">Logout</button>
+    </form>
+</div>
+
+</header>
+
+<div class="grid">
+
+{% for product in products %}
+<div class="card {% if product.has_messages %}chat-active{% endif %}">
+<img src="{{ product.image.url }}">
+
+<div class="dots {% if product.has_messages %}glow{% endif %}"
+onclick="toggleMenu({{ product.id }})">⋮</div>
+
+<div class="menu" id="menu-{{ product.id }}">
+
+<button onclick="window.location.href='/delete/{{ product.id }}/'">
+Remove Product
+</button>
+
+{% if product.chat_count > 0 %}
+
+<button>
+Active Chats ({{ product.chat_count }})
+</button>
+
+{% for buyer in product.chat_buyers %}
+
+<button onclick="window.location.href='/chat/{{ product.id }}/?buyer={{ buyer.username }}'">
+Chat with {{ buyer.username }}
+</button>
+
+{% endfor %}
+
+{% else %}
+
+<button>
+No chats yet
+</button>
+
+{% endif %}
+
+</div>
+</div>
+
+{% endfor %}
+
+</div>
+
+</body>
+</html>

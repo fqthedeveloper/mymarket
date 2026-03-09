@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat | Exotic</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: black;
+            color: white;
+        }
+
+        header {
+            padding: 20px;
+            background: black;
+            border-bottom: 1px solid gold;
+            color: gold;
+            font-family: 'Cinzel', serif;
+            font-size: 24px;
+        }
+
+        .chat-container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        .message {
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            max-width: 70%;
+        }
+
+        .sent {
+            background: gold;
+            color: black;
+            margin-left: auto;
+        }
+
+        .received {
+            background: #222;
+            border: 1px solid gold;
+        }
+
+        .quick-options {
+            margin-bottom: 15px;
+        }
+
+        .quick-options button {
+            background: none;
+            border: 1px solid gold;
+            color: gold;
+            padding: 6px 12px;
+            margin-right: 8px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .quick-options button:hover {
+            background: gold;
+            color: black;
+        }
+
+        form {
+            display: flex;
+            margin-top: 15px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            margin-right: 10px;
+        }
+
+        button.send-btn {
+            background: gold;
+            color: black;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button.send-btn:hover {
+            background: #d4af37;
+        }
+
+        .warning {
+            color: red;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+
+    <script>
+        function autoSend(text) {
+            const input = document.getElementById("messageInput");
+            input.value = text;
+            document.getElementById("chatForm").submit();
+        }
+
+        function validateMessage() {
+            const input = document.getElementById("messageInput");
+            const warning = document.getElementById("warningText");
+
+            const phonePattern = /\b\d{10}\b/;
+
+            if (phonePattern.test(input.value)) {
+                warning.style.display = "block";
+                return false;
+            }
+
+            warning.style.display = "none";
+            return true;
+        }
+    </script>
+
+</head>
+<body>
+
+<header>
+    Chat about: {{ product.title }}
+</header>
+
+<div class="chat-container">
+
+    {% if user != product.seller %}
+    <div class="quick-options">
+        <button onclick="autoSend('What is the price?')">Ask Price</button>
+        <button onclick="autoSend('What sizes are available?')">Ask Size</button>
+        <button onclick="autoSend('Can you share more details about this product?')">Ask Details</button>
+    </div>
+    {% endif %}
+
+    {% for message in messages %}
+        <div class="message {% if message.sender == user %}sent{% else %}received{% endif %}">
+            {{ message.text }}
+        </div>
+    {% endfor %}
+
+    <form method="post" action="/send-message/" id="chatForm" onsubmit="return validateMessage();">
+        {% csrf_token %}
+
+        <input type="hidden" name="product_id" value="{{ product.id }}">
+
+        <!-- IMPORTANT FIX FOR SELLER CHAT -->
+        {% if request.GET.buyer %}
+        <input type="hidden" name="buyer" value="{{ request.GET.buyer }}">
+        {% endif %}
+
+        <input type="text" name="content" id="messageInput" placeholder="Type your message..." required>
+
+        <button type="submit" class="send-btn">Send</button>
+    </form>
+
+    <div id="warningText" class="warning">
+        Sharing phone numbers is not allowed.
+    </div>
+
+</div>
+
+</body>
+</html>
