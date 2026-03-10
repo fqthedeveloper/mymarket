@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div style="max-width:700px;margin:40px auto;background:#111;padding:30px;border-radius:10px">
+
+<h2 style="color:gold;margin-bottom:20px">Profile Settings</h2>
+
+<form method="post" enctype="multipart/form-data">
+
+{% csrf_token %}
+
+<h3 style="color:gold">Basic Information</h3>
+
+<label>First Name</label>
+<input type="text" name="first_name" value="{{ request.user.first_name }}"
+style="width:100%;padding:10px;margin-bottom:15px;border:1px solid gold;background:black;color:white">
+
+<label>Last Name</label>
+<input type="text" name="last_name" value="{{ request.user.last_name }}"
+style="width:100%;padding:10px;margin-bottom:15px;border:1px solid gold;background:black;color:white">
+
+<label>Username</label>
+<input type="text" name="username" value="{{ request.user.username }}"
+style="width:100%;padding:10px;margin-bottom:15px;border:1px solid gold;background:black;color:white">
+
+<label>Email</label>
+<input type="email" name="email" value="{{ request.user.email }}"
+style="width:100%;padding:10px;margin-bottom:20px;border:1px solid gold;background:black;color:white">
+
+
+{% if profile.is_seller %}
+
+<h3 style="color:gold">Seller Details</h3>
+
+<label>Shop Name</label>
+<input type="text" name="shop_name" value="{{ profile.shop_name }}"
+style="width:100%;padding:10px;margin-bottom:15px;border:1px solid gold;background:black;color:white">
+
+<label>Shop Address</label>
+<textarea name="shop_address"
+style="width:100%;padding:10px;margin-bottom:15px;border:1px solid gold;background:black;color:white">{{ profile.shop_address }}</textarea>
+
+<label>QR Code</label>
+<input type="file" name="qr_code"
+style="width:100%;padding:10px;margin-bottom:15px;border:1px solid gold;background:black;color:white">
+
+{% if profile.qr_code %}
+<p>Current QR Code:</p>
+<img src="{{ profile.qr_code.url }}" width="150">
+{% endif %}
+
+{% endif %}
+
+<button type="submit"
+style="background:gold;color:black;padding:10px 20px;border:none;border-radius:6px;font-weight:bold;cursor:pointer;margin-top:20px">
+Update Profile
+</button>
+
+</form>
+
+</div>
+
+{% endblock %}

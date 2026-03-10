@@ -1,83 +1,33 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Upload Product - Aesthetic</title>
+{% extends "base.html" %}
 
-    <style>
-        body{
-            font-family: Arial;
-            background: black;
-            color: white;
-            padding: 40px;
-        }
+{% block content %}
 
-        input, textarea{
-            width: 420px;
-            padding: 8px;
-            margin-top: 6px;
-            margin-bottom: 20px;
-        }
+<div style="width:400px;margin:80px auto;background:#111;padding:30px;border-radius:10px;">
 
-        label{
-            color: gold;
-            font-weight: bold;
-        }
-
-        button{
-            background: gold;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        button:hover{
-            background: #d4af37;
-        }
-
-        h3{
-            color: gold;
-        }
-    </style>
-
-</head>
-<body>
-
-<h2>Upload Product</h2>
+<h2 style="color:gold;text-align:center;">Upload Product</h2>
 
 <form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
 
-    <label>Product Title</label><br>
-    <input type="text" name="title" placeholder="Product Title" required><br>
+{% csrf_token %}
 
-    <label>Product Description</label><br>
-    <textarea name="description" placeholder="Product Description" required></textarea><br>
+<input type="text" name="title" placeholder="Product title" required style="width:100%;padding:10px;margin-top:10px">
 
-    <label>Product Image</label><br>
-    <input type="file" name="image" required><br>
+<textarea name="description" placeholder="Description" required style="width:100%;padding:10px;margin-top:10px"></textarea>
 
+<input type="file" name="image" required style="margin-top:10px">
 
-    <h3>Automatic Answers for Buyer Questions</h3>
+<input type="text" name="price_reply" placeholder="Auto reply for price" style="width:100%;padding:10px;margin-top:10px">
 
+<input type="text" name="size_reply" placeholder="Auto reply for size" style="width:100%;padding:10px;margin-top:10px">
 
-    <label>Buyer Question: What is the price?</label><br>
-    <input type="text" name="price_reply" placeholder="Example: ₹1500"><br>
+<textarea name="details_reply" placeholder="Auto reply for details" style="width:100%;padding:10px;margin-top:10px"></textarea>
 
-
-    <label>Buyer Question: What sizes are available?</label><br>
-    <input type="text" name="size_reply" placeholder="Example: M, L, XL"><br>
-
-
-    <label>Buyer Question: Can you share more details about this product?</label><br>
-    <textarea name="details_reply" placeholder="Example: Pure cotton embroidered kurta"></textarea><br>
-
-
-    <button type="submit">Upload</button>
+<button style="margin-top:15px;background:gold;padding:10px;border:none;width:100%">
+Upload
+</button>
 
 </form>
 
-<p><a href="/">Back to Home</a></p>
+</div>
 
-</body>
-</html>
+{% endblock %}

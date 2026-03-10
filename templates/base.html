@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Exotic Marketplace</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<style>
+
+*{
+box-sizing:border-box;
+}
+
+body{
+margin:0;
+font-family:Arial;
+background:black;
+color:white;
+}
+
+/* ================= HEADER ================= */
+
+header{
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:15px 20px;
+border-bottom:1px solid gold;
+position:relative;
+}
+
+.logo{
+font-family:'Cinzel',serif;
+font-size:28px;
+color:gold;
+}
+
+/* SEARCH */
+
+.search-box{
+flex:1;
+max-width:450px;
+margin:0 20px;
+}
+
+.search-box input{
+width:100%;
+padding:10px;
+border-radius:6px;
+border:1px solid gold;
+background:black;
+color:white;
+}
+
+/* NAV RIGHT */
+
+.nav-right{
+display:flex;
+gap:10px;
+align-items:center;
+}
+
+.btn{
+background:gold;
+color:black;
+padding:8px 14px;
+border-radius:6px;
+text-decoration:none;
+font-weight:bold;
+border:none;
+cursor:pointer;
+}
+
+/* ================= HAMBURGER ================= */
+
+.menu-toggle{
+display:none;
+background:none;
+border:none;
+cursor:pointer;
+color:gold;
+}
+
+/* MOBILE MENU */
+
+.mobile-menu{
+display:none;
+flex-direction:column;
+gap:10px;
+background:#111;
+padding:15px;
+border-bottom:1px solid gold;
+}
+
+.mobile-menu.active{
+display:flex;
+}
+
+.mobile-menu input{
+width:100%;
+padding:10px;
+border-radius:6px;
+border:1px solid gold;
+background:black;
+color:white;
+}
+
+/* ================= GRID ================= */
+
+.grid{
+column-count:4;
+column-gap:20px;
+padding:25px;
+}
+
+/* CARD */
+
+.card{
+break-inside:avoid;
+margin-bottom:20px;
+background:#111;
+border-radius:12px;
+overflow:hidden;
+box-shadow:0 0 15px rgba(255,215,0,0.2);
+position:relative;
+}
+
+.card.chat-active{
+border:2px solid gold;
+}
+
+.card img{
+width:100%;
+display:block;
+}
+
+/* ================= ACTION BAR ================= */
+
+.action-bar{
+position:absolute;
+bottom:0;
+left:0;
+right:0;
+background:rgba(0,0,0,0.85);
+display:flex;
+justify-content:space-around;
+align-items:center;
+padding:12px 0;
+border-top:1px solid gold;
+display:none;
+}
+
+/* ICONS */
+
+.icon-btn{
+background:none;
+border:none;
+cursor:pointer;
+color:gold;
+}
+
+.icon-btn svg{
+width:22px;
+height:22px;
+stroke:gold;
+}
+
+/* ================= FULLSCREEN IMAGE ================= */
+
+.fullscreen{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:black;
+display:flex;
+justify-content:center;
+align-items:center;
+z-index:9999;
+}
+
+.fullscreen img{
+max-width:95%;
+max-height:95%;
+}
+
+/* ================= FOOTER ================= */
+
+footer{
+border-top:1px solid gold;
+padding:30px;
+text-align:center;
+color:gold;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width:1000px){
+.grid{column-count:3;}
+}
+
+@media(max-width:768px){
+
+.search-box{
+display:none;
+}
+
+.nav-right{
+display:none;
+}
+
+.menu-toggle{
+display:block;
+}
+
+.grid{
+column-count:2;
+}
+
+}
+
+@media(max-width:480px){
+.grid{column-count:1;}
+.logo{font-size:22px;}
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+<div class="logo">
+<a href="/" style="color:gold;text-decoration:none;">Exotica</a>
+</div>
+
+<div class="search-box">
+<form method="get" action="/">
+<input type="text" name="q" placeholder="🔍 Search products">
+</form>
+</div>
+
+<div class="nav-right">
+
+{% if user.is_authenticated %}
+<a href="/profile/settings/" class="btn">Profile</a>
+<a href="/wishlist/" class="btn">MyWishlist</a>
+
+{% if user.profile.is_seller %}
+<a href="/seller/" class="btn">Seller Dashboard</a>
+{% endif %}
+
+<form method="post" action="/logout/" style="display:inline;">
+{% csrf_token %}
+<button type="submit" class="btn">Logout</button>
+</form>
+
+{% else %}
+
+<a href="/login/" class="btn">Login</a>
+<a href="/register/" class="btn">Register</a>
+
+{% endif %}
+
+</div>
+
+<button class="menu-toggle" onclick="toggleMenu()">
+<i data-lucide="menu"></i>
+</button>
+
+</header>
+
+<!-- MOBILE MENU -->
+
+<div id="mobileMenu" class="mobile-menu">
+
+<form method="get" action="/">
+<input type="text" name="q" placeholder="🔍 Search products">
+</form>
+
+{% if user.is_authenticated %}
+<a href="/profile/settings/" class="btn">Profile</a>
+<a href="/wishlist/" class="btn">MyWishlist</a>
+
+{% if user.profile.is_seller %}
+<a href="/seller/" class="btn">Seller Dashboard</a>
+{% endif %}
+
+<form method="post" action="/logout/">
+{% csrf_token %}
+<button type="submit" class="btn">Logout</button>
+</form>
+
+{% else %}
+
+<a href="/login/" class="btn">Login</a>
+<a href="/register/" class="btn">Register</a>
+
+{% endif %}
+
+</div>
+
+{% block content %}
+{% endblock %}
+
+<footer>
+
+<p>© <span id="year"></span> Exotic Marketplace</p>
+<p>Buy • Sell • Connect</p>
+
+</footer>
+
+<script>
+
+/* ================= MOBILE MENU ================= */
+
+function toggleMenu(){
+
+let menu=document.getElementById("mobileMenu");
+
+if(menu.classList.contains("active")){
+menu.classList.remove("active");
+}else{
+menu.classList.add("active");
+}
+
+}
+
+/* ================= PRODUCT ACTION BAR ================= */
+
+function toggleBar(id){
+
+let bar=document.getElementById("bar-"+id);
+
+if(bar.style.display==="flex"){
+bar.style.display="none";
+}else{
+bar.style.display="flex";
+}
+
+}
+
+/* ================= LIKE ================= */
+
+function likeProduct(){
+alert("Product liked");
+}
+
+/* ================= SHARE ================= */
+
+function shareProduct(id){
+
+const link = window.location.origin + "/chat/" + id + "/";
+
+navigator.clipboard.writeText(link);
+
+alert("Product link copied");
+
+}
+
+/* ================= LONG PRESS ZOOM ================= */
+
+let pressTimer;
+
+function startPress(img){
+
+pressTimer=setTimeout(function(){
+openFullscreen(img.src);
+},700);
+
+}
+
+function cancelPress(){
+clearTimeout(pressTimer);
+}
+
+/* ================= FULLSCREEN ================= */
+
+function openFullscreen(src){
+
+let overlay=document.createElement("div");
+
+overlay.className="fullscreen";
+
+let image=document.createElement("img");
+
+image.src=src;
+
+overlay.appendChild(image);
+
+overlay.onclick=function(){
+document.body.removeChild(overlay);
+}
+
+document.body.appendChild(overlay);
+
+}
+
+/* ================= ICONS ================= */
+
+lucide.createIcons();
+
+/* ================= YEAR ================= */
+
+document.getElementById("year").innerText=new Date().getFullYear();
+
+</script>
+
+</body>
+</html>

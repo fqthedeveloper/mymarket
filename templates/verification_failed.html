@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div style="width:400px;margin:120px auto;text-align:center;background:#111;padding:40px;border-radius:10px;">
+
+<h2 style="color:red;">Verification Failed</h2>
+
+<p style="color:white;margin-top:20px;">
+Your verification link is invalid or expired.
+</p>
+
+<a href="/register/"
+style="
+display:inline-block;
+margin-top:20px;
+padding:10px 20px;
+background:gold;
+color:black;
+text-decoration:none;
+border-radius:6px;
+font-weight:bold;
+">
+Register Again
+</a>
+
+</div>
+
+{% endblock %}

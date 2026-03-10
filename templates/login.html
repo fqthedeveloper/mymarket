@@ -1,17 +1,48 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>Login</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-<h2>Login or Register</h2>
+{% block content %}
 
-<form method="POST">
+<div style="width:350px;margin:80px auto;background:#111;padding:30px;border-radius:10px;">
+
+<h2 style="text-align:center;color:gold;">Login</h2>
+
+{% if messages %}
+    {% for message in messages %}
+        <div style="
+        background:#222;
+        padding:10px;
+        margin-bottom:15px;
+        border-left:4px solid {% if message.tags == 'success' %}lime{% else %}red{% endif %};
+        ">
+        {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+<form method="post">
+
 {% csrf_token %}
-{{ form.as_p }}
-<button type="submit">Submit</button>
+
+<input type="text"
+name="username"
+placeholder="Username"
+required
+style="width:100%;padding:10px;margin-bottom:15px;border:1px solid gold;background:black;color:white;">
+
+<input type="password"
+name="password"
+placeholder="Password"
+required
+style="width:100%;padding:10px;margin-bottom:15px;border:1px solid gold;background:black;color:white;">
+
+<button class="btn" style="width:100%;">Login</button>
+
 </form>
 
-</body>
-</html>
+<div style="text-align:center;margin-top:10px;">
+<a href="/register/" style="color:gold;">Create Account</a>
+</div>
+
+</div>
+
+{% endblock %}

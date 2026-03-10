@@ -1,25 +1,38 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import login
+from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.db.models import Q
 from .models import Product, Profile, Message, SavedProduct
-
+from django.contrib.auth.models import User
+from django.contrib.sites.shortcuts import get_current_site
+from django.core.mail import send_mail
+from django.conf import settings
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_decode
+from django.contrib import messages
+from .forms import RegisterForm
+from .models import Profile
 
 # ================= HOME PAGE =================
+
 def home(request):
 
-    search_query = request.GET.get("q")
+    search_query = request.GET.get("q", "")
 
     products = Product.objects.all().order_by("-created_at")
 
     # SEARCH REORDER LOGIC
     if search_query:
+
         matched = []
         others = []
 
         for product in products:
+
             text = (product.title + " " + product.description).lower()
 
             if search_query.lower() in text:
@@ -30,23 +43,31 @@ def home(request):
         products = matched + others
 
 
-    for product in products:
-        if request.user.is_authenticated:
-            product.has_messages = Message.objects.filter(
-                product=product
-            ).filter(
-                Q(sender=request.user) | Q(receiver=request.user)
-            ).exists()
+    if request.user.is_authenticated:
 
-            product.is_saved = SavedProduct.objects.filter(
-                user=request.user,
-                product=product
-            ).exists()
-        else:
+        user_messages = Message.objects.filter(
+            Q(sender=request.user) | Q(receiver=request.user)
+        ).values_list("product_id", flat=True)
+
+        saved_products = SavedProduct.objects.filter(
+            user=request.user
+        ).values_list("product_id", flat=True)
+
+        for product in products:
+
+            product.has_messages = product.id in user_messages
+            product.is_saved = product.id in saved_products
+
+    else:
+
+        for product in products:
             product.has_messages = False
             product.is_saved = False
 
-    return render(request, "home.html", {"products": products})
+
+    return render(request, "home.html", {
+        "products": products
+    })
 
 
 # ================= WISHLIST PAGE =================
@@ -67,32 +88,166 @@ def wishlist(request):
     return render(request, "home.html", {"products": products})
 
 
+@login_required
+def toggle_wishlist(request, product_id):
+
+    product = get_object_or_404(Product, id=product_id)
+
+    saved = SavedProduct.objects.filter(
+        user=request.user,
+        product=product
+    )
+
+    if saved.exists():
+        saved.delete()   # remove from wishlist
+    else:
+        SavedProduct.objects.create(
+            user=request.user,
+            product=product
+        )
+
+    return redirect(request.META.get("HTTP_REFERER", "/"))
+
+
 # ================= REGISTER =================
 def register(request):
+
+    success = False
+
     if request.method == "POST":
-        form = UserCreationForm(request.POST)
+
+        form = RegisterForm(request.POST)
+
         if form.is_valid():
-            user = form.save()
-            Profile.objects.get_or_create(user=user)
+
+            first_name = form.cleaned_data["first_name"]
+            last_name = form.cleaned_data["last_name"]
+            username = form.cleaned_data["username"]
+            email = form.cleaned_data["email"]
+            password = form.cleaned_data["password"]
+
+            if User.objects.filter(username=username).exists():
+                messages.error(request, "Username already exists")
+
+            elif User.objects.filter(email=email).exists():
+                messages.error(request, "Email already registered")
+
+            else:
+
+                user = User.objects.create_user(
+                    username=username,
+                    email=email,
+                    password=password
+                )
+
+                user.first_name = first_name
+                user.last_name = last_name
+                user.is_active = False
+                user.save()
+
+                uid = urlsafe_base64_encode(force_bytes(user.pk))
+                token = default_token_generator.make_token(user)
+
+                domain = get_current_site(request).domain
+
+                verification_link = f"http://{domain}/verify/{uid}/{token}/"
+
+                try:
+
+                    send_mail(
+                        "Verify your account",
+                        f"Click the link below to verify your account:\n\n{verification_link}",
+                        settings.EMAIL_HOST_USER,
+                        [user.email],
+                        fail_silently=False,
+                    )
+
+                    success = True
+
+                except Exception:
+
+                    messages.error(
+                        request,
+                        "Account created but email verification could not be sent."
+                    )
+
+        else:
+            messages.error(request, "Please correct the form errors.")
+
+    else:
+        form = RegisterForm()
+
+    return render(request, "register.html", {
+        "form": form,
+        "success": success
+    })
+
+
+def verify_email(request, uidb64, token):
+
+    try:
+
+        uid = urlsafe_base64_decode(uidb64).decode()
+        user = User.objects.get(pk=uid)
+
+    except:
+
+        user = None
+
+    if user and default_token_generator.check_token(user, token):
+
+        user.is_active = True
+        user.save()
+
+        login(request, user)
+
+        return redirect("login_success")
+
+    return render(request, "verification_failed.html")
+
+
+# ================= LOGIN REDIRECT =================
+
+def login_view(request):
+
+    if request.method == "POST":
+
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+
+            if not user.is_active:
+                messages.error(request, "Please verify your email before login.")
+                return redirect("login")
+
             login(request, user)
+
+            messages.success(request, "Login successful!")
 
             next_url = request.GET.get("next")
             if next_url:
                 return redirect(next_url)
 
             return redirect("login_success")
-    else:
-        form = UserCreationForm()
 
-    return render(request, "register.html", {"form": form})
+        else:
+            messages.error(request, "Invalid username or password.")
+            return redirect("login")
 
+    return render(request, "login.html")
 
-# ================= LOGIN REDIRECT =================
 @login_required
 def login_success(request):
-    profile, created = Profile.objects.get_or_create(user=request.user)
+
+    profile, created = Profile.objects.get_or_create(
+        user=request.user
+    )
 
     next_url = request.GET.get("next")
+
     if next_url:
         return redirect(next_url)
 
@@ -105,12 +260,13 @@ def login_success(request):
 # ================= SELLER DASHBOARD =================
 @login_required
 def seller_dashboard(request):
-    profile = Profile.objects.get(user=request.user)
+
+    profile, created = Profile.objects.get_or_create(user=request.user)
 
     if not profile.is_seller:
         return redirect("home")
 
-    products = Product.objects.filter(seller=request.user)
+    products = Product.objects.filter(seller=request.user).order_by("-id")
 
     for product in products:
 
@@ -131,15 +287,16 @@ def seller_dashboard(request):
     })
 
 
-# ================= UPLOAD PRODUCT =================
 @login_required
 def upload_product(request):
-    profile = Profile.objects.get(user=request.user)
+
+    profile, created = Profile.objects.get_or_create(user=request.user)
 
     if not profile.is_seller:
         return redirect("home")
 
     if request.method == "POST":
+
         title = request.POST.get("title")
         description = request.POST.get("description")
         image = request.FILES.get("image")
@@ -149,6 +306,7 @@ def upload_product(request):
         details_reply = request.POST.get("details_reply")
 
         if title and description and image:
+
             Product.objects.create(
                 seller=request.user,
                 title=title,
@@ -158,18 +316,46 @@ def upload_product(request):
                 size_reply=size_reply,
                 details_reply=details_reply
             )
+
             return redirect("seller_dashboard")
 
     return render(request, "upload.html")
 
 
-# ================= DELETE PRODUCT =================
+@login_required
+def edit_product(request, product_id):
+
+    product = get_object_or_404(Product, id=product_id, seller=request.user)
+
+    if request.method == "POST":
+
+        product.title = request.POST.get("title")
+        product.description = request.POST.get("description")
+
+        if request.FILES.get("image"):
+            product.image = request.FILES.get("image")
+
+        product.price_reply = request.POST.get("price_reply")
+        product.size_reply = request.POST.get("size_reply")
+        product.details_reply = request.POST.get("details_reply")
+
+        product.save()
+
+        return redirect("seller_dashboard")
+
+    return render(request, "edit_product.html", {
+        "product": product
+    })
+
+
 @login_required
 def delete_product(request, product_id):
-    product = get_object_or_404(Product, id=product_id, seller=request.user)
-    product.delete()
-    return redirect("seller_dashboard")
 
+    product = get_object_or_404(Product, id=product_id, seller=request.user)
+
+    product.delete()
+
+    return redirect("seller_dashboard")
 
 # ================= CHAT =================
 @login_required
@@ -273,15 +459,101 @@ def send_message(request):
     return redirect("home")
 
 
+
 # ================= SELLER SETTINGS =================
+
+@login_required
+def profile_settings(request):
+
+    user = request.user
+    profile = user.profile
+
+    if request.method == "POST":
+
+        # USER BASIC INFO
+        first_name = request.POST.get("first_name")
+        last_name = request.POST.get("last_name")
+        username = request.POST.get("username")
+        email = request.POST.get("email")
+
+        if first_name:
+            user.first_name = first_name
+
+        if last_name:
+            user.last_name = last_name
+
+        if username:
+            user.username = username
+
+        if email:
+            user.email = email
+
+        user.save()
+
+        # SELLER EXTRA INFO
+        if profile.is_seller:
+
+            shop_name = request.POST.get("shop_name")
+            shop_address = request.POST.get("shop_address")
+
+            if shop_name:
+                profile.shop_name = shop_name
+
+            if shop_address:
+                profile.shop_address = shop_address
+
+            if request.FILES.get("qr_code"):
+                profile.qr_code = request.FILES.get("qr_code")
+
+        profile.save()
+
+        messages.success(request, "Profile updated successfully")
+
+        return redirect("profile_settings")
+
+    return render(request, "profile_settings.html", {
+        "profile": profile
+    })
+
+
+# ================= SELLER PROFILE PAGE =================
+def seller_profile(request, username):
+    seller = get_object_or_404(User, username=username)
+    profile = get_object_or_404(Profile, user=seller)
+
+    products = Product.objects.filter(seller=seller).order_by("-created_at")
+
+    return render(request, "seller_profile.html", {
+        "seller": seller,
+        "profile": profile,
+        "products": products
+    })
+
+
 @login_required
 def seller_settings(request):
-    profile = request.user.profile
+
+    user = request.user
+    profile = user.profile
 
     if not profile.is_seller:
         return redirect("home")
 
     if request.method == "POST":
+
+        # USER INFO
+        username = request.POST.get("username")
+        email = request.POST.get("email")
+
+        if username:
+            user.username = username
+
+        if email:
+            user.email = email
+
+        user.save()
+
+        # SHOP INFO
         profile.shop_name = request.POST.get("shop_name")
         profile.shop_address = request.POST.get("shop_address")
 
@@ -289,6 +561,9 @@ def seller_settings(request):
             profile.qr_code = request.FILES.get("qr_code")
 
         profile.save()
+
+        messages.success(request, "Seller settings updated successfully")
+
         return redirect("seller_settings")
 
     return render(request, "seller_settings.html", {

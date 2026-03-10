@@ -12,23 +12,28 @@ urlpatterns = [
     path('', views.home, name='home'),
 
     # Authentication
-    path('register/', views.register, name='register'),
-    path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
+    path("register/", views.register, name="register"),
+    path("verify/<uidb64>/<token>/", views.verify_email, name="verify_email"),
+    path('login/', views.login_view, name='login'),
     path('login-success/', views.login_success, name='login_success'),
     path('logout/', auth_views.LogoutView.as_view(next_page='/'), name='logout'),
 
     # Seller
-    path('seller/', views.seller_dashboard, name='seller_dashboard'),
-    path('upload/', views.upload_product, name='upload'),
-    path('delete/<int:product_id>/', views.delete_product, name='delete_product'),
+    path("seller/", views.seller_dashboard, name="seller_dashboard"),
+    path("upload/", views.upload_product, name="upload_product"),
+    path("edit/<int:product_id>/", views.edit_product, name="edit_product"),
+    path("delete/<int:product_id>/", views.delete_product, name="delete_product"),
 
     # ✅ SAVE / UNSAVE
     path('save/<int:product_id>/', views.toggle_save, name='toggle_save'),
 
     # ✅ WISHLIST (NEW SAFE ADDITION)
     path('wishlist/', views.wishlist, name='wishlist'),
+    path("wishlist-toggle/<int:product_id>/", views.toggle_wishlist, name="wishlist_toggle"),
 
-    path('seller-settings/', views.seller_settings, name='seller_settings'),
+    path("seller/settings/", views.seller_settings, name="seller_settings"),
+    path("profile/settings/", views.profile_settings, name="profile_settings"),
+
 
     # Seller Public Profile
     path('seller/<str:username>/', views.seller_profile, name='seller_profile'),

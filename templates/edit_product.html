@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div style="max-width:500px;margin:40px auto;">
+
+<h2 style="color:gold;">Edit Product</h2>
+
+<form method="post" enctype="multipart/form-data">
+
+{% csrf_token %}
+
+<input type="text" name="title" value="{{ product.title }}" required style="width:100%;padding:10px;margin-top:10px">
+
+<textarea name="description" required style="width:100%;padding:10px;margin-top:10px">{{ product.description }}</textarea>
+
+<input type="file" name="image" style="margin-top:10px">
+
+<input type="text" name="price_reply" value="{{ product.price_reply }}" placeholder="Price reply" style="width:100%;padding:10px;margin-top:10px">
+
+<input type="text" name="size_reply" value="{{ product.size_reply }}" placeholder="Size reply" style="width:100%;padding:10px;margin-top:10px">
+
+<textarea name="details_reply" placeholder="Details reply" style="width:100%;padding:10px;margin-top:10px">{{ product.details_reply }}</textarea>
+
+<button type="submit" class="btn" style="margin-top:15px;">Update Product</button>
+
+</form>
+
+</div>
+
+{% endblock %}
