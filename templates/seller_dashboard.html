@@ -1,137 +1,137 @@
 {% extends "base.html" %}
+{% block title %}Seller Dashboard - Exotic Marketplace{% endblock %}
+
 
 {% block content %}
 
 <style>
-
-.grid{
-column-count:4;
-column-gap:20px;
-padding:25px;
+.grid {
+    column-count: 4;
+    column-gap: 20px;
+    padding: 25px;
 }
 
-.card{
-break-inside:avoid;
-margin-bottom:20px;
-background:#111;
-border-radius:12px;
-overflow:hidden;
-position:relative;
-box-shadow:0 0 15px rgba(255,215,0,0.2);
+.card {
+    break-inside: avoid;
+    margin-bottom: 20px;
+    background: #111;
+    border-radius: 12px;
+    overflow: visible; /* Changed from hidden to show the menu */
+    position: relative;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
 }
 
-.card img{
-width:100%;
-display:block;
+.card img {
+    width: 100%;
+    display: block;
+    border-radius: 12px;
 }
 
-.dots{
-position:absolute;
-top:10px;
-right:10px;
-font-size:20px;
-cursor:pointer;
-background:black;
-padding:6px 10px;
-border-radius:6px;
+.dots {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    cursor: pointer;
+    background: rgba(0, 0, 0, 0.7);
+    color: gold;
+    padding: 2px 10px;
+    border-radius: 6px;
+    z-index: 10;
 }
 
-.menu{
-display:none;
-position:absolute;
-top:45px;
-right:10px;
-background:black;
-border:1px solid gold;
-border-radius:8px;
-width:160px;
-z-index:999;
+.menu {
+    display: none;
+    position: absolute;
+    top: 45px;
+    right: 10px;
+    background: #000;
+    border: 1px solid gold;
+    border-radius: 8px;
+    width: 160px;
+    z-index: 999;
 }
 
-.menu a{
-display:block;
-padding:12px;
-color:gold;
-text-decoration:none;
+.menu a {
+    display: block;
+    padding: 12px;
+    color: gold;
+    text-decoration: none;
+    font-size: 14px;
+    border-bottom: 1px solid #222;
 }
 
-.menu a:hover{
-background:rgba(255,215,0,0.1);
+.menu a:last-child {
+    border-bottom: none;
+    color: #ff4444; /* Red for delete */
 }
 
-@media(max-width:1000px){
-.grid{column-count:3;}
+.menu a:hover {
+    background: rgba(255, 215, 0, 0.1);
 }
 
-@media(max-width:768px){
-.grid{column-count:2;}
-}
-
-@media(max-width:480px){
-.grid{column-count:1;}
-}
-
+@media(max-width:1000px) { .grid { column-count: 3; } }
+@media(max-width:768px) { .grid { column-count: 2; } }
+@media(max-width:480px) { .grid { column-count: 1; } }
 </style>
 
-
-<h2 style="padding:20px;color:gold;">Seller Dashboard</h2>
+<h2 style="padding:20px; color:gold;">Seller Dashboard</h2>
 
 <div style="padding:0 20px 20px;">
-<a href="/upload/" class="btn">Add Product</a>
+    <a href="{% url 'upload_product' %}" class="btn">Add Product</a>
+    <a href="{% url 'seller_chats' %}" class="btn">
+    Open Chats ({{ chat_count }})
+    </a>
 </div>
 
 
 <div class="grid">
+    {% for product in products %}
+    <div class="card">
+        {% if product.image %}
+            <img src="{{ product.image.url }}">
+        {% endif %}
+        
+        <div class="dots" onclick="toggleProductMenu(event, {{ product.id }})">⋮</div>
 
-{% for product in products %}
-
-<div class="card">
-
-<img src="{{ product.image.url }}">
-
-<div class="dots" onclick="toggleMenu({{ product.id }})">⋮</div>
-
-<div class="menu" id="menu-{{ product.id }}">
-
-<a href="/edit/{{ product.id }}/">Edit Product</a>
-
-<a href="/delete/{{ product.id }}/">Delete Product</a>
-
+        <div class="menu" id="menu-{{ product.id }}">
+            <a href="{% url 'edit_product' product.id %}">Edit Product</a>
+            <a href="{% url 'delete_product' product.id %}" onclick="return confirm('Are you sure?')">Delete Product</a>
+        </div>
+    </div>
+    {% empty %}
+    <p style="padding: 20px; color: gray;">No products found. Add your first product!</p>
+    {% endfor %}
 </div>
-
-</div>
-
-{% endfor %}
-
-</div>
-
 
 <script>
+function toggleProductMenu(event, id) {
+    // Prevent the document click listener from firing
+    event.stopPropagation();
+    
+    let menu = document.getElementById("menu-" + id);
 
-function toggleMenu(id){
+    // Hide all other menus
+    document.querySelectorAll(".menu").forEach(function(m) {
+        if (m !== menu) {
+            m.style.display = "none";
+        }
+    });
 
-let menu=document.getElementById("menu-"+id)
-
-document.querySelectorAll(".menu").forEach(function(m){
-if(m!==menu){
-m.style.display="none"
+    // Toggle current menu
+    if (menu.style.display === "block") {
+        menu.style.display = "none";
+    } else {
+        menu.style.display = "block";
+    }
 }
-})
 
-if(menu.style.display==="block"){
-menu.style.display="none"
-}else{
-menu.style.display="block"
-}
-
-}
-
-document.addEventListener("click",function(){
-document.querySelectorAll(".menu").forEach(function(menu){
-menu.style.display="none"
-})
-})
-
+// Close menus when clicking anywhere else on the page
+document.addEventListener("click", function() {
+    document.querySelectorAll(".menu").forEach(function(menu) {
+        menu.style.display = "none";
+    });
+});
 </script>
 
 {% endblock %}

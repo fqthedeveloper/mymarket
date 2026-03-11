@@ -1,28 +1,103 @@
 {% extends "base.html" %}
 
+{% block title %}
+Edit Product
+{% endblock %}
+
 {% block content %}
 
-<div style="max-width:500px;margin:40px auto;">
+<style>
 
-<h2 style="color:gold;">Edit Product</h2>
+.edit-container{
+max-width:500px;
+margin:60px auto;
+background:#111;
+padding:30px;
+border-radius:12px;
+border:1px solid #222;
+}
+
+.edit-container h2{
+color:gold;
+text-align:center;
+margin-bottom:20px;
+}
+
+.edit-container input,
+.edit-container textarea{
+width:100%;
+padding:10px;
+margin-top:10px;
+border-radius:6px;
+border:1px solid #333;
+background:#000;
+color:white;
+}
+
+.edit-container input:focus,
+.edit-container textarea:focus{
+outline:none;
+border-color:gold;
+}
+
+.edit-container button{
+margin-top:20px;
+width:100%;
+padding:12px;
+background:gold;
+border:none;
+border-radius:6px;
+font-weight:bold;
+cursor:pointer;
+}
+
+.edit-container button:hover{
+background:#e6c200;
+}
+
+.preview{
+margin-top:15px;
+}
+
+.preview img{
+width:120px;
+border-radius:8px;
+}
+
+</style>
+
+
+<div class="edit-container">
+
+<h2>Edit Product</h2>
 
 <form method="post" enctype="multipart/form-data">
 
 {% csrf_token %}
 
-<input type="text" name="title" value="{{ product.title }}" required style="width:100%;padding:10px;margin-top:10px">
+<input type="text" name="title" value="{{ product.title }}" required>
 
-<textarea name="description" required style="width:100%;padding:10px;margin-top:10px">{{ product.description }}</textarea>
+<textarea name="description" required>{{ product.description }}</textarea>
 
-<input type="file" name="image" style="margin-top:10px">
+<div class="preview">
+<img src="{{ product.image.url }}">
+</div>
 
-<input type="text" name="price_reply" value="{{ product.price_reply }}" placeholder="Price reply" style="width:100%;padding:10px;margin-top:10px">
+<input type="file" name="image">
 
-<input type="text" name="size_reply" value="{{ product.size_reply }}" placeholder="Size reply" style="width:100%;padding:10px;margin-top:10px">
+<input type="number" step="0.01" name="price" value="{{ product.price }}" required>
 
-<textarea name="details_reply" placeholder="Details reply" style="width:100%;padding:10px;margin-top:10px">{{ product.details_reply }}</textarea>
+<input type="number" name="stock" value="{{ product.stock }}" required>
 
-<button type="submit" class="btn" style="margin-top:15px;">Update Product</button>
+<input type="text" name="price_reply" value="{{ product.price_reply }}" placeholder="Price reply">
+
+<input type="text" name="size_reply" value="{{ product.size_reply }}" placeholder="Size reply">
+
+<textarea name="details_reply" placeholder="Details reply">{{ product.details_reply }}</textarea>
+
+<button type="submit">
+Update Product
+</button>
 
 </form>
 

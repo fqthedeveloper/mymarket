@@ -1,5 +1,7 @@
 {% extends "base.html" %}
-
+{% block title %}
+Login - Exotic Marketplace
+{% endblock %}
 {% block content %}
 
 <div style="width:350px;margin:80px auto;background:#111;padding:30px;border-radius:10px;">
@@ -40,7 +42,11 @@ style="width:100%;padding:10px;margin-bottom:15px;border:1px solid gold;backgrou
 </form>
 
 <div style="text-align:center;margin-top:10px;">
-<a href="/register/" style="color:gold;">Create Account</a>
+<a href="/register/" style="color:gold;">Create Account</a> &nbsp;|&nbsp;
+<a href="{% url 'password_reset' %}" style="color:gold;"> Forgot Password? </a>
+</div>
+<div style="margin-top:10px">
+
 </div>
 
 </div>

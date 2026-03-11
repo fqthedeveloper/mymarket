@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ product.title }}
+{% endblock %}
+
+{% block content %}
+
+<style>
+
+.product-page{
+max-width:1200px;
+margin:auto;
+padding:40px 20px;
+}
+
+/* GRID LAYOUT */
+
+.product-grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:50px;
+align-items:center;
+}
+
+/* IMAGE */
+
+.product-image{
+background:#111;
+padding:20px;
+border-radius:14px;
+border:1px solid #222;
+}
+
+.product-image img{
+width:100%;
+border-radius:10px;
+transition:0.3s;
+}
+
+.product-image img:hover{
+transform:scale(1.03);
+}
+
+/* PRODUCT INFO */
+
+.product-info h1{
+font-size:34px;
+margin-bottom:15px;
+font-weight:700;
+}
+
+.price{
+font-size:28px;
+color:#ffc107;
+font-weight:700;
+margin-bottom:10px;
+}
+
+.description{
+color:#bbb;
+line-height:1.6;
+margin-bottom:15px;
+}
+
+.stock{
+color:#888;
+margin-bottom:20px;
+}
+
+/* SELLER CARD */
+
+.seller-card{
+background:#111;
+padding:20px;
+border-radius:12px;
+border:1px solid #222;
+margin-top:20px;
+}
+
+.seller-card h3{
+margin-bottom:10px;
+color:#ffc107;
+}
+
+.seller-card p{
+margin:5px 0;
+color:#ccc;
+}
+
+.seller-card a{
+display:inline-block;
+margin-top:10px;
+color:#ffc107;
+text-decoration:none;
+font-weight:600;
+}
+
+.seller-card a:hover{
+text-decoration:underline;
+}
+
+/* BUTTONS */
+
+.buttons{
+margin-top:25px;
+display:flex;
+gap:15px;
+flex-wrap:wrap;
+}
+
+.btn{
+padding:12px 22px;
+border-radius:8px;
+font-weight:600;
+text-decoration:none;
+transition:0.2s;
+}
+
+/* CART BUTTON */
+
+.btn-cart{
+background:#ffc107;
+color:black;
+}
+
+.btn-cart:hover{
+background:#e0a800;
+}
+
+/* CHAT BUTTON */
+
+.btn-chat{
+background:#222;
+color:white;
+border:1px solid #444;
+}
+
+.btn-chat:hover{
+background:#333;
+}
+
+/* RESPONSIVE */
+
+@media (max-width:900px){
+
+.product-grid{
+grid-template-columns:1fr;
+gap:30px;
+}
+
+.product-info h1{
+font-size:28px;
+}
+
+.price{
+font-size:24px;
+}
+
+.buttons{
+flex-direction:column;
+}
+
+.btn{
+width:100%;
+text-align:center;
+}
+
+}
+
+</style>
+
+
+<div class="product-page">
+
+<div class="product-grid">
+
+<!-- IMAGE -->
+<div class="product-image">
+<img src="{{ product.image.url }}">
+</div>
+
+<!-- INFO -->
+<div class="product-info">
+
+<h1>{{ product.title }}</h1>
+
+<div class="price">
+₹{{ product.price }}
+</div>
+
+<p class="description">
+{{ product.description }}
+</p>
+
+<p class="stock">
+Stock: {{ product.stock }}
+</p>
+
+<!-- SELLER -->
+<div class="seller-card">
+
+<h3>Seller</h3>
+
+<p>{{ seller_profile.shop_name }}</p>
+
+<p>{{ seller_profile.shop_address }}</p>
+
+<a href="/seller/{{ product.seller.username }}/">
+Visit Seller Shop →
+</a>
+
+</div>
+
+<!-- BUTTONS -->
+<div class="buttons">
+
+<a href="/add-to-cart/{{ product.id }}/" class="btn btn-cart">
+Add To Cart
+</a>
+
+<a href="{% url 'start_chat' product.id %}" class="btn btn-chat">
+Chat With Seller
+</a>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}

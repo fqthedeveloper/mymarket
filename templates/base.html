@@ -6,7 +6,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Exotic Marketplace</title>
+<title>
+{% block title %}
+Exotic Marketplace
+{% endblock %}
+</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/lucide@latest"></script>
@@ -252,11 +256,21 @@ column-count:2;
 <div class="nav-right">
 
 {% if user.is_authenticated %}
-<a href="/profile/settings/" class="btn">Profile</a>
+
+<a href="/profile/" class="btn">Profile</a>
 <a href="/wishlist/" class="btn">MyWishlist</a>
 
 {% if user.profile.is_seller %}
 <a href="/seller/" class="btn">Seller Dashboard</a>
+<a href="/seller-chats/" class="btn">Chats</a>
+<a href="/seller-orders/" class="btn">Orders</a>
+
+{% else %}
+<a href="/cart/" class="btn">Cart</a>
+<a href="/buyer-chats/" class="btn">Chats</a>
+<a href="/orders/" class="btn">My Orders</a>
+<a href="/order-requests/" class='btn'>Requests</a>
+
 {% endif %}
 
 <form method="post" action="/logout/" style="display:inline;">
@@ -288,11 +302,21 @@ column-count:2;
 </form>
 
 {% if user.is_authenticated %}
+
 <a href="/profile/settings/" class="btn">Profile</a>
 <a href="/wishlist/" class="btn">MyWishlist</a>
 
 {% if user.profile.is_seller %}
 <a href="/seller/" class="btn">Seller Dashboard</a>
+<a href="/seller-chats/" class="btn">Chats</a>
+<a href="/seller-orders/" class="btn">Orders</a>
+
+{% else %}
+<a href="/cart/" class="btn">Cart</a>
+<a href="/buyer-chats/" class="btn">Chats</a>
+<a href="/orders/">My Orders</a>
+<a href="/order-requests/" class='btn'>Requests</a>
+
 {% endif %}
 
 <form method="post" action="/logout/">
@@ -321,78 +345,48 @@ column-count:2;
 
 <script>
 
-/* ================= MOBILE MENU ================= */
-
 function toggleMenu(){
-
 let menu=document.getElementById("mobileMenu");
-
-if(menu.classList.contains("active")){
-menu.classList.remove("active");
-}else{
-menu.classList.add("active");
+menu.classList.toggle("active");
 }
-
-}
-
-/* ================= PRODUCT ACTION BAR ================= */
 
 function toggleBar(id){
-
 let bar=document.getElementById("bar-"+id);
-
 if(bar.style.display==="flex"){
 bar.style.display="none";
 }else{
 bar.style.display="flex";
 }
-
 }
-
-/* ================= LIKE ================= */
 
 function likeProduct(){
 alert("Product liked");
 }
 
-/* ================= SHARE ================= */
-
 function shareProduct(id){
-
 const link = window.location.origin + "/chat/" + id + "/";
-
 navigator.clipboard.writeText(link);
-
 alert("Product link copied");
-
 }
-
-/* ================= LONG PRESS ZOOM ================= */
 
 let pressTimer;
 
 function startPress(img){
-
 pressTimer=setTimeout(function(){
 openFullscreen(img.src);
 },700);
-
 }
 
 function cancelPress(){
 clearTimeout(pressTimer);
 }
 
-/* ================= FULLSCREEN ================= */
-
 function openFullscreen(src){
 
 let overlay=document.createElement("div");
-
 overlay.className="fullscreen";
 
 let image=document.createElement("img");
-
 image.src=src;
 
 overlay.appendChild(image);
@@ -402,14 +396,9 @@ document.body.removeChild(overlay);
 }
 
 document.body.appendChild(overlay);
-
 }
 
-/* ================= ICONS ================= */
-
 lucide.createIcons();
-
-/* ================= YEAR ================= */
 
 document.getElementById("year").innerText=new Date().getFullYear();
 

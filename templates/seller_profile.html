@@ -1,132 +1,273 @@
 {% extends "base.html" %}
 
+{% block title %}
+{{ seller.username }} | Exotic
+{% endblock %}
+
 {% block content %}
 
-    <title>{{ seller.username }} | Exotic</title>
+<style>
 
-    <style>
-        body {
-            margin: 0;
-            font-family: 'Georgia', serif;
-            background: black;
-            color: gold;
-        }
+*{
+box-sizing:border-box;
+margin:0;
+padding:0;
+}
 
-        header {
-            padding: 20px;
-            text-align: center;
-            border-bottom: 1px solid gold;
-        }
+body{
+background:black;
+font-family:Arial;
+color:white;
+}
 
-        h1 {
-            font-size: 36px;
-            letter-spacing: 2px;
-        }
+/* HEADER */
 
-        .container {
-            padding: 30px;
-            max-width: 1000px;
-            margin: auto;
-        }
+.profile-header{
+text-align:center;
+padding:30px 15px;
+border-bottom:1px solid gold;
+}
 
-        .info-box {
-            border: 1px solid gold;
-            padding: 20px;
-            margin-bottom: 30px;
-        }
+.username{
+font-size:32px;
+font-weight:bold;
+display:flex;
+justify-content:center;
+align-items:center;
+gap:8px;
+}
 
-        .info-box h2 {
-            margin-top: 0;
-        }
+.verified{
+color:#00e1ff;
+font-size:20px;
+}
 
-        .qr img {
-            width: 200px;
-            margin-top: 15px;
-        }
+.domain{
+font-size:14px;
+color:gray;
+margin-top:5px;
+}
 
-        .products {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 20px;
-        }
 
-        .product-card {
-            border: 1px solid gold;
-            padding: 10px;
-            text-align: center;
-        }
+/* CONTAINER */
 
-        .product-card img {
-            width: 100%;
-            height: auto;
-        }
+.container{
+max-width:1200px;
+margin:auto;
+padding:25px;
+}
 
-        .verified {
-            color: gold;
-            font-size: 18px;
-            margin-left: 8px;
-        }
 
-        a {
-            color: gold;
-            text-decoration: none;
-        }
+/* SHOP BOX */
 
-        .back-home {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 8px 15px;
-            border: 1px solid gold;
-        }
+.shop-box{
+border:1px solid gold;
+border-radius:10px;
+padding:20px;
+margin-bottom:35px;
+background:#111;
+}
 
-        .back-home:hover {
-            background: gold;
-            color: black;
-        }
+.shop-box h2{
+margin-bottom:10px;
+color:gold;
+}
 
-    </style>
-</head>
+.shop-box p{
+margin:6px 0;
+}
 
-<body>
+.qr img{
+width:160px;
+margin-top:10px;
+border-radius:6px;
+}
 
-<header>
-    <h1>
-        {{ seller.username }}
-        <span class="verified">✔ Verified</span>
-    </h1>
-</header>
 
-<div class="container">
+/* PRODUCT GRID */
 
-    <div class="info-box">
-        <h2>Shop Details</h2>
+.products{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+gap:18px;
+margin-top:20px;
+}
 
-        <p><strong>Shop Name:</strong> {{ profile.shop_name|default:"Not Provided" }}</p>
-        <p><strong>Address:</strong> {{ profile.shop_address|default:"Not Provided" }}</p>
 
-        {% if profile.qr_code %}
-            <div class="qr">
-                <p><strong>Scan & Pay:</strong></p>
-                <img src="{{ profile.qr_code.url }}">
-            </div>
-        {% endif %}
-    </div>
+/* PRODUCT CARD */
 
-    <h2>Products by {{ seller.username }}</h2>
+.product-card{
+background:#1a1a1a;
+border-radius:10px;
+overflow:hidden;
+transition:0.3s;
+}
 
-    <div class="products">
-        {% for product in products %}
-            <div class="product-card">
-                <img src="{{ product.image.url }}">
-                <p>{{ product.title }}</p>
-            </div>
-        {% empty %}
-            <p>No products available.</p>
-        {% endfor %}
-    </div>
+.product-card:hover{
+transform:translateY(-5px);
+}
 
-    <a href="/" class="back-home">← Back to Home</a>
+.product-card img{
+width:100%;
+height:200px;
+object-fit:cover;
+}
+
+.product-card p{
+padding:10px;
+text-align:center;
+}
+
+
+/* BACK BUTTON */
+
+.back-home{
+display:inline-block;
+margin-top:30px;
+padding:10px 18px;
+border:1px solid gold;
+border-radius:6px;
+color:gold;
+text-decoration:none;
+}
+
+.back-home:hover{
+background:gold;
+color:black;
+}
+
+
+/* MOBILE */
+
+@media(max-width:600px){
+
+.username{
+font-size:24px;
+}
+
+.products{
+grid-template-columns:repeat(2,1fr);
+}
+
+.product-card img{
+height:160px;
+}
+
+}
+
+
+/* TABLET */
+
+@media(min-width:601px) and (max-width:900px){
+
+.products{
+grid-template-columns:repeat(3,1fr);
+}
+
+}
+
+
+/* DESKTOP */
+
+@media(min-width:901px){
+
+.products{
+grid-template-columns:repeat(4,1fr);
+}
+
+}
+
+</style>
+
+
+<!-- PROFILE HEADER -->
+
+<div class="profile-header">
+
+<div class="username">
+
+{{ seller.username }}
+
+{% if profile.is_verified %}
+<span class="verified">✔</span>
+{% endif %}
 
 </div>
 
-{% endblock %}  
+<div class="domain">
+
+{{ seller.username }}.exotica.com
+
+</div>
+
+</div>
+
+
+
+<div class="container">
+
+
+<!-- SHOP DETAILS -->
+
+<div class="shop-box">
+
+<h2>Shop Details</h2>
+
+<p><strong>Shop Name:</strong>
+{{ profile.shop_name|default:"Not Provided" }}
+</p>
+
+<p><strong>Address:</strong>
+{{ profile.shop_address|default:"Not Provided" }}
+</p>
+
+{% if profile.qr_code %}
+
+<div class="qr">
+
+<p><strong>Scan & Pay</strong></p>
+
+<img src="{{ profile.qr_code.url }}">
+
+</div>
+
+{% endif %}
+
+</div>
+
+
+
+<!-- PRODUCTS -->
+
+<h2 style="margin-bottom:10px;">Products by {{ seller.username }}</h2>
+
+<div class="products">
+
+{% for product in products %}
+
+<a href="{% url 'product_detail' product.id %}" style="text-decoration:none;color:white;">
+
+<div class="product-card">
+
+<img src="{{ product.image.url }}">
+
+<p>{{ product.title }}</p>
+
+</div>
+
+</a>
+
+{% empty %}
+
+<p>No products available.</p>
+
+{% endfor %}
+
+</div>
+
+
+<a href="/" class="back-home">← Back to Home</a>
+
+</div>
+
+{% endblock %}

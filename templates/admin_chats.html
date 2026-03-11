@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div style="max-width:900px;margin:auto;padding:20px">
+
+<h2 style="color:white;text-align:center">
+Admin Chat Monitor
+</h2>
+
+{% for c in conversations %}
+
+<a href="{% url 'chat_room' c.id %}">
+
+<div style="background:#111;padding:15px;margin:10px;border-radius:8px">
+
+Buyer: {{ c.buyer.username }}
+
+<br>
+
+Seller: {{ c.seller.username }}
+
+<br>
+
+Product: {{ c.product.title }}
+
+</div>
+
+</a>
+
+{% endfor %}
+
+</div>
+
+{% endblock %}

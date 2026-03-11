@@ -7,10 +7,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ================= SECURITY =================
 SECRET_KEY = 'django-insecure-change-this-later'
 DEBUG = True
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # ================= INSTALLED APPS =================
 INSTALLED_APPS = [
+    "channels",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -18,6 +19,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'marketplace.apps.MarketplaceConfig',
+    
 ]
 
 # ================= MIDDLEWARE =================
@@ -51,7 +53,8 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'mymarket.wsgi.application'
+#WSGI_APPLICATION = 'mymarket.wsgi.application'
+ASGI_APPLICATION = 'mymarket.asgi.application'
 
 # ================= DATABASE =================
 DATABASES = {
@@ -100,3 +103,11 @@ EMAIL_USE_TLS = True
 
 EMAIL_HOST_USER = "fqthedeveloper@gmail.com"
 EMAIL_HOST_PASSWORD = "dqnv dfms urki bytr"
+
+
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}

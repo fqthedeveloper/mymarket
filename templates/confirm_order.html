@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}
+Confirm Order
+{% endblock %}
+
+{% block content %}
+
+<h2 style="padding:20px">Confirm Order</h2>
+
+<div style="max-width:700px;margin:auto">
+
+<div style="display:flex;gap:20px;border-bottom:1px solid gold;padding:20px">
+
+<img src="{{ req.product.image.url }}" width="120">
+
+<div>
+
+<h3>{{ req.product.title }}</h3>
+
+<p>Seller: {{ req.seller.username }}</p>
+
+<p>Price: ₹{{ req.agreed_price }}</p>
+
+</div>
+
+</div>
+
+<form method="POST" style="padding:20px">
+
+{% csrf_token %}
+
+<h3>Quantity</h3>
+
+<input type="number" name="quantity" value="1" min="1" required>
+
+<h3>Shipping Address</h3>
+
+<input type="text" name="address1" placeholder="Address Line 1" required style="width:100%;padding:10px;margin:5px 0">
+
+<input type="text" name="address2" placeholder="Address Line 2" style="width:100%;padding:10px;margin:5px 0">
+
+<input type="text" name="city" placeholder="City" required style="width:100%;padding:10px;margin:5px 0">
+
+<input type="text" name="state" placeholder="State" required style="width:100%;padding:10px;margin:5px 0">
+
+<input type="text" name="pincode" placeholder="Pincode" required style="width:100%;padding:10px;margin:5px 0">
+
+<h3>Payment Method</h3>
+
+<select name="payment" style="width:100%;padding:10px">
+
+<option value="cod">Cash On Delivery</option>
+
+<option value="upi">UPI</option>
+
+<option value="card">Card</option>
+
+<option value="bank">Bank Transfer</option>
+
+</select>
+
+<br><br>
+
+<button style="background:black;color:white;padding:12px 30px">
+
+Place Order
+
+</button>
+
+</form>
+
+</div>
+
+{% endblock %}

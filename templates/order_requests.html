@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}
+Order Requests
+{% endblock %}
+
+{% block content %}
+
+<h2 style="padding:20px">Negotiation Requests</h2>
+
+<div style="max-width:900px;margin:auto">
+
+{% for r in requests %}
+
+<div style="display:flex;gap:20px;border-bottom:1px solid gold;padding:20px">
+
+<img src="{{ r.product.image.url }}" width="120">
+
+<div>
+
+<h3>{{ r.product.title }}</h3>
+
+<p>Seller: {{ r.seller.username }}</p>
+
+<p>Agreed Price: ₹{{ r.agreed_price }}</p>
+
+<a href="/accept-request/{{ r.id }}/">
+
+<button style="background:gold;border:none;padding:10px">
+
+Accept Order
+
+</button>
+
+</a>
+
+</div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+{% endblock %}

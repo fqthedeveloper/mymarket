@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% block title %}Seller Chats - Exotic Marketplace{% endblock %}
+
+{% load custom_tags %}
+
+{% block content %}
+
+<style>
+
+.chat-list{
+max-width:750px;
+margin:auto;
+padding:25px;
+}
+
+.chat-title{
+color:white;
+text-align:center;
+margin-bottom:20px;
+font-size:26px;
+font-weight:600;
+}
+
+/* CHAT CARD */
+
+.chat-item{
+background:#111;
+padding:18px;
+margin-bottom:12px;
+border-radius:12px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+transition:0.25s;
+border:1px solid #1e1e1e;
+}
+
+.chat-item:hover{
+background:#181818;
+transform:translateY(-2px);
+}
+
+/* LEFT SIDE */
+
+.chat-left{
+display:flex;
+align-items:center;
+gap:12px;
+}
+
+/* AVATAR */
+
+.avatar{
+width:45px;
+height:45px;
+border-radius:50%;
+background:#2a2a2a;
+display:flex;
+align-items:center;
+justify-content:center;
+font-weight:bold;
+color:white;
+font-size:16px;
+}
+
+/* USER INFO */
+
+.chat-info{
+display:flex;
+flex-direction:column;
+}
+
+.chat-name{
+color:white;
+font-weight:600;
+font-size:16px;
+}
+
+.chat-product{
+color:#888;
+font-size:13px;
+margin-top:3px;
+}
+
+/* UNREAD BADGE */
+
+.badge{
+background:#25D366;
+color:white;
+padding:5px 10px;
+border-radius:15px;
+font-size:12px;
+font-weight:600;
+}
+
+</style>
+
+
+<div class="chat-list">
+
+<h2 class="chat-title">
+buyer Chats
+</h2>
+
+{% for c in conversations %}
+
+<a href="{% url 'chat_room' c.id %}" style="text-decoration:none">
+
+<div class="chat-item">
+
+<div class="chat-left">
+
+<div class="avatar">
+{{ c.buyer.username|first|upper }}
+</div>
+
+<div class="chat-info">
+
+<div class="chat-name">
+{{ c.buyer.username }}
+</div>
+
+<div class="chat-product">
+{{ c.product.title }}
+</div>
+
+</div>
+
+</div>
+
+{% if unread|get_item:c.id %}
+
+<div class="badge">
+{{ unread|get_item:c.id }}
+</div>
+
+{% endif %}
+
+</div>
+
+</a>
+
+{% endfor %}
+
+</div>
+
+{% endblock %}

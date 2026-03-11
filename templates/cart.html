@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}
+Cart
+{% endblock %}
+
+{% block content %}
+
+<h2 style="padding:20px">Shopping Cart</h2>
+
+<div style="max-width:900px;margin:auto">
+
+{% for item in cart_items %}
+
+<div style="display:flex;gap:20px;border-bottom:1px solid gold;padding:20px">
+
+<img src="{{ item.product.image.url }}" width="120">
+
+<div>
+
+<h3>{{ item.product.title }}</h3>
+
+<p>Price: ₹{{ item.product.price }}</p>
+
+<p>
+
+<button onclick="updateCart({{ item.id }},'minus')">➖</button>
+
+<b id="qty-{{ item.id }}" style="margin:0 10px">{{ item.quantity }}</b>
+
+<button onclick="updateCart({{ item.id }},'plus')">➕</button>
+
+</p>
+
+<p>Total: ₹<span id="item-total-{{ item.id }}">{{ item.total_price }}</span></p>
+
+<a href="/remove-cart/{{ item.id }}/" style="color:red">
+Remove
+</a>
+
+</div>
+
+</div>
+
+{% endfor %}
+
+<h2>Total: ₹<span id="cart-total">{{ total }}</span></h2>
+
+<form method="POST" action="/place-order/">
+
+{% csrf_token %}
+
+<label>
+
+<input type="checkbox" name="terms" required>
+
+I agree to Terms & Conditions
+
+</label>
+
+<br><br>
+
+<button style="padding:10px 30px;background:black;color:white">
+
+Place Order
+
+</button>
+
+</form>
+
+</div>
+
+<script>
+
+function updateCart(cart_id,action){
+
+fetch("/update-cart/",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/x-www-form-urlencoded",
+"X-CSRFToken":"{{ csrf_token }}"
+},
+
+body:"cart_id="+cart_id+"&action="+action
+
+})
+
+.then(response=>response.json())
+
+.then(data=>{
+
+document.getElementById("qty-"+cart_id).innerText=data.quantity
+
+document.getElementById("item-total-"+cart_id).innerText=data.item_total
+
+document.getElementById("cart-total").innerText=data.cart_total
+
+})
+
+}
+
+</script>
+
+{% endblock %}
