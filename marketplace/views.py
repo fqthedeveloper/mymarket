@@ -85,7 +85,10 @@ def home(request):
     })
 
 
-# ================= WISHLIST PAGE =================
+# ================= Aboutus =================
+def about(request):
+    return render(request, "about.html")
+
 # ================= WISHLIST PAGE =================
 @login_required
 def wishlist(request):
@@ -242,6 +245,7 @@ def verify_email(request, uidb64, token):
 def login_view(request):
 
     # ================= BLOCK LOGIN PAGE IF USER ALREADY LOGGED IN =================
+
     if request.user.is_authenticated:
 
         profile, created = Profile.objects.get_or_create(
@@ -253,19 +257,30 @@ def login_view(request):
 
         return redirect("home")
 
+
     # ================= LOGIN PROCESS =================
+
     if request.method == "POST":
 
         username = request.POST.get("username")
         password = request.POST.get("password")
 
-        user = authenticate(request, username=username, password=password)
+        user = authenticate(
+            request,
+            username=username,
+            password=password
+        )
 
         if user is not None:
 
             if not user.is_active:
-                messages.error(request, "Please verify your email before login.")
-                return redirect("login")
+
+                messages.error(
+                    request,
+                    "Please verify your email before login."
+                )
+
+                return render(request, "login.html")
 
             login(request, user)
 
@@ -280,11 +295,18 @@ def login_view(request):
 
         else:
 
-            messages.error(request, "Invalid username or password.")
-            return redirect("login")
+            messages.error(
+                request,
+                "Invalid username or password."
+            )
+
+            return render(request, "login.html")
+
 
     return render(request, "login.html")
 
+
+# ================= LOGIN SUCCESS REDIRECT =================
 
 @login_required
 def login_success(request):
@@ -302,7 +324,6 @@ def login_success(request):
         return redirect("seller_dashboard")
 
     return redirect("home")
-
 
 # ================= SELLER DASHBOARD =================
 
@@ -703,21 +724,50 @@ def product_detail(request, product_id):
         "seller_profile": seller_profile
     })
     
+    
 @login_required
-def add_to_cart(request, product_id):
+def add_to_cart(request,product_id):
 
-    product = get_object_or_404(Product, id=product_id)
+    product = get_object_or_404(Product,id=product_id)
 
-    cart_item, created = Cart.objects.get_or_create(
+    cart_item,created = Cart.objects.get_or_create(
+
         user=request.user,
-        product=product
+        product=product,
+
+        defaults={
+            "quantity":1,
+            "negotiated_price":None
+        }
+
     )
 
     if not created:
+
         cart_item.quantity += 1
+        cart_item.negotiated_price = None
         cart_item.save()
 
     return redirect("cart")
+
+@login_required
+def add_negotiated_to_cart(request,product_id,price):
+
+    product = get_object_or_404(Product,id=product_id)
+
+    cart_item,created = Cart.objects.get_or_create(
+
+        user=request.user,
+        product=product
+
+    )
+
+    cart_item.negotiated_price = price
+    cart_item.quantity = 1
+    cart_item.save()
+
+    return redirect("cart")
+
 
 @login_required
 def cart_view(request):
@@ -727,7 +777,7 @@ def cart_view(request):
     total = 0
 
     for item in cart_items:
-        total += item.product.price * item.quantity
+        total += item.total_price()
 
     return render(request,"cart.html",{
 
@@ -735,45 +785,47 @@ def cart_view(request):
         "total":total
 
     })
-    
+
+
 @login_required
 def update_cart_quantity(request):
 
     cart_id = request.POST.get("cart_id")
     action = request.POST.get("action")
 
-    cart = get_object_or_404(Cart, id=cart_id, user=request.user)
+    cart = get_object_or_404(Cart,id=cart_id,user=request.user)
 
     if action == "plus":
         cart.quantity += 1
 
-    elif action == "minus" and cart.quantity > 1:
-        cart.quantity -= 1
+    elif action == "minus":
+        if cart.quantity > 1:
+            cart.quantity -= 1
 
     cart.save()
 
-    item_total = cart.product.price * cart.quantity
+    item_total = cart.total_price()
 
     cart_items = Cart.objects.filter(user=request.user)
 
     cart_total = 0
 
     for item in cart_items:
-        cart_total += item.product.price * item.quantity
+        cart_total += item.total_price()
 
     return JsonResponse({
 
-        "quantity": cart.quantity,
-        "item_total": item_total,
-        "cart_total": cart_total
+        "quantity":cart.quantity,
+        "item_total":item_total,
+        "cart_total":cart_total
 
     })
-    
+
 
 @login_required
-def remove_cart(request, cart_id):
+def remove_cart(request,cart_id):
 
-    cart_item = get_object_or_404(Cart, id=cart_id, user=request.user)
+    cart_item = get_object_or_404(Cart,id=cart_id,user=request.user)
 
     cart_item.delete()
 
@@ -784,7 +836,7 @@ def negotiation_order(request, product_id):
 
     product = get_object_or_404(Product, id=product_id)
 
-    # find conversation safely
+    # find conversation
     conversation = Conversation.objects.filter(
         product=product,
         seller=request.user
@@ -802,25 +854,22 @@ def negotiation_order(request, product_id):
         if not price:
             return redirect("chat_room", conversation.id)
 
-        # prevent duplicate request
-        exists = OrderRequest.objects.filter(
+        # ADD PRODUCT DIRECTLY TO BUYER CART
+        cart_item, created = Cart.objects.get_or_create(
+
+            user=buyer,
             product=product,
-            buyer=buyer,
-            seller=request.user,
-            status="pending"
-        ).exists()
 
-        if exists:
-            return redirect("chat_room", conversation.id)
-
-        OrderRequest.objects.create(
-
-            product=product,
-            buyer=buyer,
-            seller=request.user,
-
-            agreed_price=price
+            defaults={
+                "quantity": 1,
+                "negotiated_price": price
+            }
         )
+
+        if not created:
+            cart_item.negotiated_price = price
+            cart_item.quantity = 1
+            cart_item.save()
 
     return redirect("seller_dashboard")
 
@@ -892,6 +941,8 @@ def place_order(request):
             return redirect("cart")
 
         return redirect("checkout")
+
+    return redirect("cart")
     
 
 @login_required
@@ -902,7 +953,7 @@ def checkout(request):
     total = 0
 
     for item in cart_items:
-        total += item.product.price * item.quantity
+        total += item.total_price()
 
     if request.method == "POST":
 
@@ -923,7 +974,7 @@ def checkout(request):
                 buyer=request.user,
                 seller=item.product.seller,
 
-                price=item.product.price,
+                price=item.final_price(),
                 quantity=item.quantity,
 
                 address_line1=address1,
@@ -1018,45 +1069,30 @@ def accept_order_request(request,request_id):
 
     if request.method == "POST":
 
-        address1 = request.POST.get("address1")
-        address2 = request.POST.get("address2")
+        cart_item,created = Cart.objects.get_or_create(
 
-        city = request.POST.get("city")
-        state = request.POST.get("state")
-        pincode = request.POST.get("pincode")
-
-        payment = request.POST.get("payment")
-
-        quantity = int(request.POST.get("quantity"))
-
-        Order.objects.create(
-
+            user=request.user,
             product=req.product,
-            buyer=req.buyer,
-            seller=req.seller,
 
-            price=req.agreed_price,
-            quantity=quantity,
-
-            payment_method=payment,
-
-            address_line1=address1,
-            address_line2=address2,
-
-            city=city,
-            state=state,
-            pincode=pincode
+            defaults={
+                "negotiated_price":req.agreed_price,
+                "quantity":1
+            }
         )
+
+        if not created:
+            cart_item.quantity += 1
+            cart_item.negotiated_price = req.agreed_price
+            cart_item.save()
 
         req.status="approved"
         req.save()
 
-        return redirect("orders")
+        return redirect("cart")
 
     return render(request,"confirm_order.html",{
 
         "req":req
 
     })
-    
     

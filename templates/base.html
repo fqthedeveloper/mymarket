@@ -34,18 +34,21 @@ header{
 display:flex;
 align-items:center;
 justify-content:space-between;
-padding:15px 20px;
+padding:14px 20px;
 border-bottom:1px solid gold;
-position:relative;
+background:black;
+position:sticky;
+top:0;
+z-index:999;
 }
 
 .logo{
 font-family:'Cinzel',serif;
-font-size:28px;
+font-size:26px;
 color:gold;
 }
 
-/* SEARCH */
+/* ================= SEARCH ================= */
 
 .search-box{
 flex:1;
@@ -62,105 +65,14 @@ background:black;
 color:white;
 }
 
-/* NAV RIGHT */
+/* ================= NAV RIGHT ================= */
 
 .nav-right{
 display:flex;
-gap:10px;
 align-items:center;
-}
-
-.btn{
-background:gold;
-color:black;
-padding:8px 14px;
-border-radius:6px;
-text-decoration:none;
-font-weight:bold;
-border:none;
-cursor:pointer;
-}
-
-/* ================= HAMBURGER ================= */
-
-.menu-toggle{
-display:none;
-background:none;
-border:none;
-cursor:pointer;
-color:gold;
-}
-
-/* MOBILE MENU */
-
-.mobile-menu{
-display:none;
-flex-direction:column;
-gap:10px;
-background:#111;
-padding:15px;
-border-bottom:1px solid gold;
-}
-
-.mobile-menu.active{
-display:flex;
-}
-
-.mobile-menu input{
-width:100%;
-padding:10px;
-border-radius:6px;
-border:1px solid gold;
-background:black;
-color:white;
-}
-
-/* ================= GRID ================= */
-
-.grid{
-column-count:4;
-column-gap:20px;
-padding:25px;
-}
-
-/* CARD */
-
-.card{
-break-inside:avoid;
-margin-bottom:20px;
-background:#111;
-border-radius:12px;
-overflow:hidden;
-box-shadow:0 0 15px rgba(255,215,0,0.2);
+gap:18px;
 position:relative;
 }
-
-.card.chat-active{
-border:2px solid gold;
-}
-
-.card img{
-width:100%;
-display:block;
-}
-
-/* ================= ACTION BAR ================= */
-
-.action-bar{
-position:absolute;
-bottom:0;
-left:0;
-right:0;
-background:rgba(0,0,0,0.85);
-display:flex;
-justify-content:space-around;
-align-items:center;
-padding:12px 0;
-border-top:1px solid gold;
-display:none;
-}
-
-/* ICONS */
 
 .icon-btn{
 background:none;
@@ -175,24 +87,95 @@ height:22px;
 stroke:gold;
 }
 
-/* ================= FULLSCREEN IMAGE ================= */
+/* ================= DROPDOWN ================= */
 
-.fullscreen{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:black;
-display:flex;
-justify-content:center;
-align-items:center;
-z-index:9999;
+.dropdown{
+position:relative;
 }
 
-.fullscreen img{
-max-width:95%;
-max-height:95%;
+.dropdown-menu{
+position:absolute;
+right:0;
+top:35px;
+background:#111;
+border:1px solid gold;
+border-radius:8px;
+min-width:180px;
+display:none;
+flex-direction:column;
+overflow:hidden;
+}
+
+.dropdown-menu a{
+padding:10px 15px;
+text-decoration:none;
+color:white;
+border-bottom:1px solid #333;
+}
+
+.dropdown-menu a:hover{
+background:#222;
+}
+
+.dropdown-menu form button{
+width:100%;
+padding:10px;
+background:none;
+border:none;
+color:white;
+text-align:left;
+cursor:pointer;
+}
+
+.dropdown-menu.show{
+display:flex;
+}
+
+/* ================= BUTTON ================= */
+
+.btn{
+background:gold;
+color:black;
+padding:7px 12px;
+border-radius:6px;
+text-decoration:none;
+font-weight:bold;
+}
+
+/* ================= MOBILE ================= */
+
+.menu-toggle{
+display:none;
+background:none;
+border:none;
+color:gold;
+cursor:pointer;
+}
+
+.mobile-menu{
+display:none;
+flex-direction:column;
+gap:10px;
+padding:15px;
+background:#111;
+border-bottom:1px solid gold;
+}
+
+.mobile-menu.active{
+display:flex;
+}
+
+.mobile-menu a{
+color:white;
+text-decoration:none;
+}
+
+/* ================= GRID ================= */
+
+.grid{
+column-count:4;
+column-gap:20px;
+padding:25px;
 }
 
 /* ================= FOOTER ================= */
@@ -206,22 +189,18 @@ color:gold;
 
 /* ================= RESPONSIVE ================= */
 
-@media(max-width:1000px){
-.grid{column-count:3;}
-}
-
-@media(max-width:768px){
+@media(max-width:900px){
 
 .search-box{
 display:none;
 }
 
-.nav-right{
-display:none;
-}
-
 .menu-toggle{
 display:block;
+}
+
+.nav-right{
+display:none;
 }
 
 .grid{
@@ -232,7 +211,6 @@ column-count:2;
 
 @media(max-width:480px){
 .grid{column-count:1;}
-.logo{font-size:22px;}
 }
 
 </style>
@@ -249,34 +227,57 @@ column-count:2;
 
 <div class="search-box">
 <form method="get" action="/">
-<input type="text" name="q" placeholder="🔍 Search products">
+<input type="text" name="q" placeholder="Search products">
 </form>
 </div>
 
 <div class="nav-right">
 
+    <a href="/" class="btn"> Home</a>
+    <a href="/about/" class="btn"> About Us</a>
+
 {% if user.is_authenticated %}
 
-<a href="/profile/" class="btn">Profile</a>
-<a href="/wishlist/" class="btn">MyWishlist</a>
+{% if not user.profile.is_seller %}
+<a href="/cart/" class="icon-btn">
+<i data-lucide="shopping-cart"></i>
+</a>
+{% endif %}
+
+<div class="dropdown">
+
+<button class="icon-btn" onclick="toggleDropdown()">
+<i data-lucide="more-vertical"></i>
+</button>
+
+<div id="userMenu" class="dropdown-menu">
+
+<a href="/profile/">Profile</a>
+
+<a href="/wishlist/">Wishlist</a>
 
 {% if user.profile.is_seller %}
-<a href="/seller/" class="btn">Seller Dashboard</a>
-<a href="/seller-chats/" class="btn">Chats</a>
-<a href="/seller-orders/" class="btn">Orders</a>
+
+<a href="/seller/">Seller Dashboard</a>
+<a href="/seller-orders/">Orders</a>
+<a href="/seller-chats/">Chats</a>
 
 {% else %}
-<a href="/cart/" class="btn">Cart</a>
-<a href="/buyer-chats/" class="btn">Chats</a>
-<a href="/orders/" class="btn">My Orders</a>
-<a href="/order-requests/" class='btn'>Requests</a>
+
+<a href="/orders/">My Orders</a>
+<a href="/buyer-chats/">Chats</a>
+<a href="/order-requests/">Requests</a>
 
 {% endif %}
 
-<form method="post" action="/logout/" style="display:inline;">
+<form method="post" action="/logout/">
 {% csrf_token %}
 <button type="submit" class="btn">Logout</button>
 </form>
+
+</div>
+
+</div>
 
 {% else %}
 
@@ -298,36 +299,38 @@ column-count:2;
 <div id="mobileMenu" class="mobile-menu">
 
 <form method="get" action="/">
-<input type="text" name="q" placeholder="🔍 Search products">
+<input type="text" name="q" placeholder="Search products">
 </form>
 
 {% if user.is_authenticated %}
 
-<a href="/profile/settings/" class="btn">Profile</a>
-<a href="/wishlist/" class="btn">MyWishlist</a>
+<a href="/profile/">Profile</a>
+<a href="/wishlist/">Wishlist</a>
 
 {% if user.profile.is_seller %}
-<a href="/seller/" class="btn">Seller Dashboard</a>
-<a href="/seller-chats/" class="btn">Chats</a>
-<a href="/seller-orders/" class="btn">Orders</a>
+
+<a href="/seller/">Seller Dashboard</a>
+<a href="/seller-orders/">Orders</a>
+<a href="/seller-chats/">Chats</a>
 
 {% else %}
-<a href="/cart/" class="btn">Cart</a>
-<a href="/buyer-chats/" class="btn">Chats</a>
-<a href="/orders/">My Orders</a>
-<a href="/order-requests/" class='btn'>Requests</a>
+
+<a href="/cart/">Cart</a>
+<a href="/orders/">Orders</a>
+<a href="/buyer-chats/">Chats</a>
+<a href="/order-requests/">Requests</a>
 
 {% endif %}
 
 <form method="post" action="/logout/">
 {% csrf_token %}
-<button type="submit" class="btn">Logout</button>
+<button class="btn" type="submit">Logout</button>
 </form>
 
 {% else %}
 
-<a href="/login/" class="btn">Login</a>
-<a href="/register/" class="btn">Register</a>
+<a href="/login/">Login</a>
+<a href="/register/">Register</a>
 
 {% endif %}
 
@@ -350,52 +353,20 @@ let menu=document.getElementById("mobileMenu");
 menu.classList.toggle("active");
 }
 
-function toggleBar(id){
-let bar=document.getElementById("bar-"+id);
-if(bar.style.display==="flex"){
-bar.style.display="none";
-}else{
-bar.style.display="flex";
+function toggleDropdown(){
+let menu=document.getElementById("userMenu");
+menu.classList.toggle("show");
+}
+
+window.onclick=function(event){
+
+if(!event.target.closest('.dropdown')){
+let menu=document.getElementById("userMenu");
+if(menu){
+menu.classList.remove("show");
 }
 }
 
-function likeProduct(){
-alert("Product liked");
-}
-
-function shareProduct(id){
-const link = window.location.origin + "/chat/" + id + "/";
-navigator.clipboard.writeText(link);
-alert("Product link copied");
-}
-
-let pressTimer;
-
-function startPress(img){
-pressTimer=setTimeout(function(){
-openFullscreen(img.src);
-},700);
-}
-
-function cancelPress(){
-clearTimeout(pressTimer);
-}
-
-function openFullscreen(src){
-
-let overlay=document.createElement("div");
-overlay.className="fullscreen";
-
-let image=document.createElement("img");
-image.src=src;
-
-overlay.appendChild(image);
-
-overlay.onclick=function(){
-document.body.removeChild(overlay);
-}
-
-document.body.appendChild(overlay);
 }
 
 lucide.createIcons();

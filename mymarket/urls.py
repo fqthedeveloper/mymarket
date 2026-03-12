@@ -13,6 +13,7 @@ urlpatterns = [
 
     # Home
     path('', views.home, name='home'),
+    path('about/', views.about, name='about'),
 
     # Authentication
     path("register/", views.register, name="register"),

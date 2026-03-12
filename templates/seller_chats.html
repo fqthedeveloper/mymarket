@@ -144,4 +144,26 @@ buyer Chats
 
 </div>
 
+<script>
+
+const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+
+const socket = new WebSocket(
+protocol + "://" + window.location.host + "/ws/chat-list/"
+);
+
+socket.onmessage = function(event){
+
+    const data = JSON.parse(event.data);
+
+    if(data.type === "update"){
+
+        location.reload();
+
+    }
+
+};
+
+</script>
+
 {% endblock %}

@@ -1,0 +1,366 @@
+{% extends "base.html" %}
+
+{% block title %}About Us - Exotica Marketplace{% endblock %}
+
+{% block content %}
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+font-family:'Poppins',sans-serif;
+background:black;
+color:white;
+line-height:1.6;
+}
+
+/* HERO */
+
+.hero{
+height:60vh;
+display:flex;
+align-items:center;
+justify-content:center;
+flex-direction:column;
+text-align:center;
+background:linear-gradient(rgba(0,0,0,0.7),rgba(0,0,0,0.9)),url("https://images.unsplash.com/photo-1607082349566-187342175e2f");
+background-size:cover;
+background-position:center;
+}
+
+.hero h1{
+font-family:'Cinzel',serif;
+font-size:48px;
+color:gold;
+margin-bottom:10px;
+}
+
+.hero p{
+max-width:600px;
+font-size:18px;
+color:#ddd;
+}
+
+/* CONTAINER */
+
+.container{
+max-width:1100px;
+margin:auto;
+padding:60px 20px;
+}
+
+/* STORY */
+
+.story{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:40px;
+align-items:center;
+}
+
+.story img{
+width:100%;
+border-radius:10px;
+}
+
+.story h2{
+font-size:32px;
+color:gold;
+margin-bottom:15px;
+}
+
+.story p{
+color:#ccc;
+}
+
+/* FEATURES */
+
+.features{
+margin-top:70px;
+text-align:center;
+}
+
+.features h2{
+font-size:34px;
+color:gold;
+margin-bottom:40px;
+}
+
+.feature-grid{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:30px;
+}
+
+.feature{
+background:#111;
+padding:30px;
+border-radius:10px;
+border:1px solid #333;
+transition:0.3s;
+}
+
+.feature:hover{
+border-color:gold;
+transform:translateY(-5px);
+}
+
+.feature h3{
+color:gold;
+margin-bottom:10px;
+}
+
+.feature p{
+color:#bbb;
+}
+
+/* TEAM */
+
+.team{
+margin-top:80px;
+text-align:center;
+}
+
+.team h2{
+font-size:34px;
+color:gold;
+margin-bottom:40px;
+}
+
+.team-grid{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:30px;
+}
+
+.member{
+background:#111;
+padding:25px;
+border-radius:10px;
+}
+
+.member img{
+width:100%;
+border-radius:8px;
+margin-bottom:15px;
+}
+
+.member h4{
+color:gold;
+margin-bottom:5px;
+}
+
+.member p{
+color:#aaa;
+font-size:14px;
+}
+
+/* CTA */
+
+.cta{
+margin-top:80px;
+padding:60px 20px;
+background:#111;
+text-align:center;
+border-top:1px solid gold;
+border-bottom:1px solid gold;
+}
+
+.cta h2{
+font-size:32px;
+color:gold;
+margin-bottom:10px;
+}
+
+.cta p{
+color:#ccc;
+margin-bottom:20px;
+}
+
+.cta a{
+display:inline-block;
+background:gold;
+color:black;
+padding:12px 22px;
+border-radius:6px;
+text-decoration:none;
+font-weight:600;
+}
+
+/* FOOTER */
+
+footer{
+padding:30px;
+text-align:center;
+color:gold;
+border-top:1px solid gold;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:900px){
+
+.story{
+grid-template-columns:1fr;
+}
+
+.feature-grid{
+grid-template-columns:1fr;
+}
+
+.team-grid{
+grid-template-columns:1fr;
+}
+
+.hero h1{
+font-size:36px;
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+
+<!-- HERO -->
+
+<section class="hero">
+
+<h1>About Exotica</h1>
+
+<p>
+A premium marketplace where buyers and sellers connect to discover unique products and experiences.
+</p>
+
+</section>
+
+
+
+<!-- STORY -->
+
+<div class="container">
+
+<div class="story">
+
+<img src="https://images.unsplash.com/photo-1556740738-b6a63e27c4df">
+
+<div>
+
+<h2>Our Story</h2>
+
+<p>
+Exotica Marketplace was created to connect people who love discovering unique and high-quality products. Our goal is to build a trusted platform where sellers can grow their business and buyers can find products they truly love.
+</p>
+
+<br>
+
+<p>
+We believe ecommerce should be simple, secure, and enjoyable. By combining technology, community, and innovation, Exotica creates a marketplace where everyone benefits.
+</p>
+
+</div>
+
+</div>
+
+
+
+<!-- FEATURES -->
+
+<div class="features">
+
+<h2>Why Choose Exotica</h2>
+
+<div class="feature-grid">
+
+<div class="feature">
+<h3>Trusted Sellers</h3>
+<p>
+Every seller is verified to ensure quality products and safe transactions.
+</p>
+</div>
+
+<div class="feature">
+<h3>Secure Payments</h3>
+<p>
+Advanced security ensures every purchase is protected and reliable.
+</p>
+</div>
+
+<div class="feature">
+<h3>Global Marketplace</h3>
+<p>
+Buy and sell products from anywhere with a worldwide community.
+</p>
+</div>
+
+</div>
+
+</div>
+
+
+
+<!-- TEAM -->
+
+<div class="team">
+
+<h2>Our Team</h2>
+
+<div class="team-grid">
+
+<div class="member">
+
+<img src="https://randomuser.me/api/portraits/men/32.jpg">
+
+<h4>Rahul Sharma</h4>
+
+<p>Founder & CEO</p>
+
+</div>
+
+<div class="member">
+
+<img src="https://randomuser.me/api/portraits/women/44.jpg">
+
+<h4>Priya Mehta</h4>
+
+<p>Head of Operations</p>
+
+</div>
+
+<div class="member">
+
+<img src="https://randomuser.me/api/portraits/men/75.jpg">
+
+<h4>Arjun Patel</h4>
+
+<p>Lead Developer</p>
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<!-- CTA -->
+
+<section class="cta">
+
+<h2>Start Your Journey With Us</h2>
+
+<p>Join Exotica today and explore a world of unique products.</p>
+
+<a href="/register/">Join Marketplace</a>
+
+</section>
+
+
+{% endblock %}

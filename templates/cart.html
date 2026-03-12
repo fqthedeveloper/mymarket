@@ -10,6 +10,8 @@ Cart
 
 <div style="max-width:900px;margin:auto">
 
+{% if cart_items %}
+
 {% for item in cart_items %}
 
 <div style="display:flex;gap:20px;border-bottom:1px solid gold;padding:20px">
@@ -20,19 +22,48 @@ Cart
 
 <h3>{{ item.product.title }}</h3>
 
-<p>Price: ₹{{ item.product.price }}</p>
+<p>
+Original Price : ₹{{ item.product.price }}
+</p>
+
+{% if item.negotiated_price %}
+
+<p style="color:red">
+Seller Discount : -₹{{ item.discount }}
+</p>
+
+<p style="color:limegreen;font-weight:bold">
+Negotiated Price : ₹{{ item.final_price }}
+</p>
+
+{% else %}
+
+<p>
+Final Price : ₹{{ item.product.price }}
+</p>
+
+{% endif %}
+
 
 <p>
 
-<button onclick="updateCart({{ item.id }},'minus')">➖</button>
+<button onclick="updateCart({{ item.id }},'minus')" style="padding:5px 10px">➖</button>
 
-<b id="qty-{{ item.id }}" style="margin:0 10px">{{ item.quantity }}</b>
+<b id="qty-{{ item.id }}" style="padding:10px">
+{{ item.quantity }}
+</b>
 
-<button onclick="updateCart({{ item.id }},'plus')">➕</button>
+<button onclick="updateCart({{ item.id }},'plus')" style="padding:5px 10px">➕</button>
 
 </p>
 
-<p>Total: ₹<span id="item-total-{{ item.id }}">{{ item.total_price }}</span></p>
+
+<p>
+Total : ₹
+<span id="item-total-{{ item.id }}">
+{{ item.total_price }}
+</span>
+</p>
 
 <a href="/remove-cart/{{ item.id }}/" style="color:red">
 Remove
@@ -44,23 +75,32 @@ Remove
 
 {% endfor %}
 
-<h2>Total: ₹<span id="cart-total">{{ total }}</span></h2>
+<hr style="border:1px solid gold">
+
+<h2>
+Cart Total : ₹
+<span id="cart-total">{{ total }}</span>
+</h2>
+
+
+<br>
+
 
 <form method="POST" action="/place-order/">
 
 {% csrf_token %}
 
-<label>
+<label style="color:white;font-size:14px">
 
 <input type="checkbox" name="terms" required>
 
-I agree to Terms & Conditions
+I agree to the Terms & Conditions
 
 </label>
 
 <br><br>
 
-<button style="padding:10px 30px;background:black;color:white">
+<button style="background:gold;border:none;padding:15px 40px;font-size:16px;font-weight:bold">
 
 Place Order
 
@@ -68,7 +108,21 @@ Place Order
 
 </form>
 
+
+{% else %}
+
+<h3 style="padding:20px">Your cart is empty</h3>
+
+<a href="/" style="background:gold;padding:10px 20px;text-decoration:none;color:black">
+
+Continue Shopping
+
+</a>
+
+{% endif %}
+
 </div>
+
 
 <script>
 
@@ -91,11 +145,11 @@ body:"cart_id="+cart_id+"&action="+action
 
 .then(data=>{
 
-document.getElementById("qty-"+cart_id).innerText=data.quantity
+document.getElementById("qty-"+cart_id).innerText = data.quantity
 
-document.getElementById("item-total-"+cart_id).innerText=data.item_total
+document.getElementById("item-total-"+cart_id).innerText = data.item_total
 
-document.getElementById("cart-total").innerText=data.cart_total
+document.getElementById("cart-total").innerText = data.cart_total
 
 })
 
